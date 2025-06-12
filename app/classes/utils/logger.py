@@ -1,80 +1,205 @@
-from typing import List, Literal
+from typing import List, Literal, Optional
 from app.classes.utils.singleton import SingletonMeta
+import logging
+import colorlog
+import sys
 
+"""
+The following escape codes are made available for use in the format string:
 
-LOG_COLOR = Literal[
-    "purple",
-    "cyan",
-    "orange",
-    "darkcyan",
-    "blue",
-    "green",
-    "yellow",
-    "red",
-    "bold",
-    "underline",
-    "end",
-]
+{color}, fg_{color}, bg_{color}: Foreground and background colors.
+bold, bold_{color}, fg_bold_{color}, bg_bold_{color}: Bold/bright colors.
+thin, thin_{color}, fg_thin_{color}: Thin colors (terminal dependent).
+reset: Clear all formatting (both foreground and background colors).
+The available color names are:
 
-LOG_COLOR_END = "\033[0m"
+black
+red
+green
+yellow
+blue,
+purple
+cyan
+white
+You can also use "bright" colors. These aren't standard ANSI codes, and support for these varies wildly across different terminals.
 
-LOG_COLOR_DICT = {
-    "purple": "\033[95m",
-    "cyan": "\033[96m",
-    "orange": "\033[38;5;208m",
-    "darkcyan": "\033[36m",
-    "blue": "\033[94m",
-    "green": "\033[92m",
-    "yellow": "\033[93m",
-    "red": "\033[91m",
-    "bold": "\033[1m",
-    "underline": "\033[4m",
-    "end": LOG_COLOR_END,
-}
+light_black
+light_red
+light_green
+light_yellow
+light_blue
+light_purple
+light_cyan
+light_white
 
-
-class MessagePart:
-    text = ""
-    color = None
-
-    def __init__(self, text: str, color: LOG_COLOR):
-        self.text = text
-        self.color = LOG_COLOR_DICT.get(color, LOG_COLOR_END)
-
-    def __str__(self) -> str:
-        return print(self.color + self.text + LOG_COLOR_END)
-
-
-class Message:
-    _parts: List[MessagePart] = []
-
-    def __init__(self, parts: List[MessagePart]):
-        self._parts = parts
-
-    def __str__(self) -> str:
-        result = ""
-        for part in self._parts:
-            result += part.color + part.text + LOG_COLOR_END
+"""
 
 
 class Logger(metaclass=SingletonMeta):
     active = False
+    _temp_log_color: Optional[str] = None  # Для тимчасового кольору
 
     def __init__(self):
-        pass
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.DEBUG)
 
-    def activate(self):
-        self.active = True
+        console_handler = logging.StreamHandler()
 
-    def deactivate(self):
-        self.active = False
+        # Зберігаємо початкові log_colors
+        self._initial_log_colors = {
+            "DEBUG": "cyan",
+            "INFO": "green",
+            "WARNING": "yellow",
+            "ERROR": "red",
+            "CRITICAL": "bold_red",
+        }
 
-    def isActivate(self):
-        if self.active:
-            return True
+        # Кастомний форматувальник для обробки temp_log_color
+        class CustomColoredFormatter(colorlog.ColoredFormatter):
+            def format(self, record):
+                original_level_color = self.log_colors.get(record.levelname)
+                original_message_color = self.log_colors.get("message")
 
-    def log(self, message: Message):
-        print(message)
+                if hasattr(record, "temp_log_color") and record.temp_log_color:
+                    temp_color = record.temp_log_color
+                    self.log_colors[record.levelname] = temp_color
+                    self.log_colors["message"] = temp_color
+
+                # ТУТ ТАКОЖ ПОТРІБНО ПЕРЕВІРЯТИ І ВІДНОВЛЮВАТИ `secondary_log_colors`
+                # Якщо ви використовуєте `secondary_log_colors`, то кольори для `asctime` та `name`
+                # також можуть бути змінені, якщо ви їх визначаєте у `secondary_log_colors`.
+                # Однак, якщо secondary_log_colors не змінюються динамічно, то цей блок не потрібен.
+                # Якщо ж ви все-таки використовуєте `secondary_log_colors`
+                # і вони можуть змінюватися, то треба зберігати їх оригінальні значення.
+
+                # Для поточного сценарію, де secondary_log_colors є статичними
+                # і ви їх не змінюєте через temp_log_color,
+                # цей CustomColoredFormatter достатньо лише для log_colors.
+
+                result = super().format(record)
+
+                if hasattr(record, "temp_log_color") and record.temp_log_color:
+                    if original_level_color:
+                        self.log_colors[record.levelname] = original_level_color
+                    else:
+                        self.log_colors.pop(record.levelname, None)
+
+                    if original_message_color:
+                        self.log_colors["message"] = original_message_color
+                    else:
+                        self.log_colors.pop("message", None)
+
+                return result
+
+        self.formatter = CustomColoredFormatter(
+            "%(time_log_color)s%(asctime)s%(reset)s %(light_cyan)s|%(reset)s %(module_log_color)s%(name)s%(reset)s %(light_cyan)s|%(reset)s %(level_log_color)s%(levelname)s%(reset)s %(light_cyan)s|%(reset)s %(log_color)s%(message)s%(reset)s",
+            log_colors=self._initial_log_colors,
+            secondary_log_colors={
+                "level": {
+                    "DEBUG": "blue",
+                    "INFO": "green",
+                    "WARNING": "yellow",
+                    "ERROR": "red",
+                    "CRITICAL": "red",
+                },
+                "time": {
+                    "DEBUG": "blue",
+                    "INFO": "green",
+                    "WARNING": "yellow",
+                    "ERROR": "red",
+                    "CRITICAL": "red",
+                },
+                "module": {
+                    "DEBUG": "light_cyan",
+                    "INFO": "light_cyan",
+                    "WARNING": "light_cyan",
+                    "ERROR": "light_cyan",
+                    "CRITICAL": "light_cyan",
+                },
+            },
+            style="%",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+
+        console_handler.setFormatter(self.formatter)
+        self.logger.addHandler(console_handler)
+
+    # Решта методів Logger (debug, info, warning, error, critical, _print_colored_raw, delimetr)
+    # залишаються без змін, як у попередньому робочому варіанті.
+    # ... (скорочено для читабельності, переконайтесь, що вони присутні у вашому коді)
+
+    def _log_with_temp_color(self, level, msg: str, color: Optional[str] = None):
+        extra_kwargs = {}
+        if color:
+            extra_kwargs["extra"] = {"temp_log_color": color}
+        self.logger.log(level, msg, **extra_kwargs)
+
+    def debug(self, msg: str, color: Optional[str] = None):
+        self._log_with_temp_color(logging.DEBUG, msg, color)
+
+    def info(self, msg: str, color: Optional[str] = None):
+        self._log_with_temp_color(logging.INFO, msg, color)
+
+    def warning(self, msg: str, color: Optional[str] = None):
+        self._log_with_temp_color(logging.WARNING, msg, color)
+
+    def error(self, msg: str, color: Optional[str] = None):
+        self._log_with_temp_color(logging.ERROR, msg, color)
+
+    def critical(self, msg: str, color: Optional[str] = None):
+        self._log_with_temp_color(logging.CRITICAL, msg, color)
+
+    def _print_colored_raw(self, message: str, color: str):
+        temp_formatter = colorlog.ColoredFormatter(
+            f"%({color})s%(message)s%(reset)s",
+            log_colors={color: color},
+        )
+        temp_record = logging.LogRecord(
+            name="dummy",
+            level=logging.INFO,
+            pathname="<string>",
+            lineno=0,
+            msg=message,
+            args=(),
+            exc_info=None,
+            func="_print_colored_raw",
+        )
+        colored_output = temp_formatter.format(temp_record)
+        print(colored_output)
+
+    def delimetr(self, size: int = 79, color: str = "white", text: str = ""):
+        delimiter_char = "="
+        base_delimiter_string = delimiter_char * size
+
+        if text:
+            self._print_colored_raw(base_delimiter_string, color)
+            self._print_colored_raw(text, color)
+            self._print_colored_raw(base_delimiter_string, color)
+        else:
+            self._print_colored_raw(base_delimiter_string, color)
 
 
-# def log(self,msg,)
+if __name__ == "__main__":
+    try:
+        from app.classes.utils.singleton import SingletonMeta
+
+        class TempLogger(Logger, metaclass=SingletonMeta):
+            pass
+
+        logger = TempLogger()
+    except ImportError:
+        print(
+            "Warning: SingletonMeta not found, running Logger without it for example."
+        )
+        logger = Logger()
+
+    logger.info("Звичайне INFO повідомлення.")
+    logger.info("Це INFO повідомлення синього кольору.", color="blue")
+    logger.warning("Звичайне WARNING повідомлення.")
+    logger.error("Це ERROR повідомлення з жирним зеленим кольором.", color="bold_green")
+    logger.debug("Звичайне DEBUG повідомлення.")
+    logger.debug("Це DEBUG повідомлення з червоним фоном.", color="bg_red,white")
+
+    logger.delimetr(color="magenta")
+    logger.delimetr(text="Розділювач з текстом", color="yellow")
+    logger.info("Продовження виконання програми.")

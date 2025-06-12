@@ -1,15 +1,16 @@
+from app.classes.utils.logger import Logger
 from classes.declarations import DeclTypes, DeclarationArray
 from classes.element_types import ElementsTypes
 from app.classes.utils.singleton import SingletonMeta
 from classes.typedef import TypedefArray
-from app.classes.utils.string_formater import removeTrailingComma
-from utils.utils import printWithColor, Color
 from classes.module import ModuleArray
 from classes.module_call import ModuleCallArray
 import os
 
 
 class Program(metaclass=SingletonMeta):
+    logger = Logger()
+
     def __init__(self, path_to_result: str = None) -> None:
         self.path_to_result = path_to_result
         self.modules: ModuleArray = ModuleArray()
@@ -26,11 +27,8 @@ class Program(metaclass=SingletonMeta):
 
     def readFileData(self, path):
         self.file_path = path
-        printWithColor(
-            f"===============================================================================\n",
-            Color.BLUE,
-        )
-        printWithColor(f"Read SV file {path}\n", Color.BLUE)
+        self.logger.delimetr(color="blue", text=f"Read file {path}")
+
         f = open(path, "r")
         data = f.read()
         f.close()
@@ -43,8 +41,9 @@ class Program(metaclass=SingletonMeta):
                 self.path_to_result += os.sep
         else:
             self.path_to_result = "results" + os.sep
-        printWithColor(
-            'Path to result: "{0}"\n'.format(self.path_to_result), Color.ORANGE
+
+        self.logger.info(
+            'Path to result: "{0}"\n'.format(self.path_to_result), "bold_yellow"
         )
 
         if not os.path.exists(self.path_to_result[:-1]):
@@ -64,6 +63,7 @@ class Program(metaclass=SingletonMeta):
                 )
         evt += ");"
         self.writeToFile(self.path_to_result + "project.evt_descript", evt)
+
         printWithColor(".evt_descript file created \n", Color.PURPLE)
 
     def createENV(self):
