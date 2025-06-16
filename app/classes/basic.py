@@ -1,20 +1,25 @@
 from typing import List, Tuple
-from classes.element_types import ElementsTypes
-from utils.utils import Color, is_interval_contained, printWithColor
+from app.classes.element_types import ElementsTypes
+from app.utils.counters import Counters
+from app.utils.logger import Logger
+from app.utils.string_formater import StringFormater
+from app.utils.unsorted import UnsortedUnils
 
 
 class Basic:
+    counters = Counters()
+    logger = Logger()
+    utils = UnsortedUnils()
+    string_formater = StringFormater()
+
     def __init__(
         self,
         identifier: str,
         source_interval: Tuple[int, int],
         element_type: ElementsTypes = ElementsTypes.NONE_ELEMENT,
     ):
-        from classes.counters import CounterTypes
-        from utils.utils import Counters_Object
-
         self.identifier = identifier
-        self.sequence = (Counters_Object.getCounter(CounterTypes.SEQUENCE_COUNTER),)
+        self.sequence = (self.counters.get(self.counters.types.SEQUENCE_COUNTER),)
         self.source_interval: Tuple[int, int] = source_interval
         self.element_type: ElementsTypes = element_type
         self.number: int | None = None
@@ -39,13 +44,20 @@ class Basic:
 
 
 class BasicArray:
+    counters = Counters()
+    logger = Logger()
+    utils = UnsortedUnils()
+    string_formater = StringFormater()
+
     def __init__(self, element_type: Basic):
         self.elements: List[Basic] = []
         self.element_type: Basic = element_type
 
     def checkSourceInteval(self, source_interval: Tuple[int, int]):
         for element in self.elements:
-            if is_interval_contained(source_interval, element.source_interval):
+            if self.utils.is_interval_contained(
+                source_interval, element.source_interval
+            ):
                 return False
         return True
 
@@ -108,9 +120,8 @@ class BasicArray:
     def __iadd__(self, other):
         if isinstance(other, BasicArray):
             if self.element_type != other.element_type:
-                printWithColor(
-                    f"WARNING: Adding BasicArray of type {other.element_type} to BasicArray of type {self.element_type}.",
-                    Color.YELLOW,
+                self.logger.warning(
+                    f"Adding BasicArray of type {other.element_type} to BasicArray of type {self.element_type}.",
                 )
             self.elements.extend(other.elements)
         elif isinstance(other, Basic):
@@ -124,9 +135,8 @@ class BasicArray:
     def addElement(self, new_element: Basic):
         self.elements.append(new_element)
         if not isinstance(new_element, self.element_type):
-            printWithColor(
-                f"WARNING: Object should be of type {self.element_type} but you passed an object of type {type(new_element)}. \n Object: {new_element}",
-                Color.YELLOW,
+            self.logger.warning(
+                f"Object should be of type {self.element_type} but you passed an object of type {type(new_element)}. \n Object: {new_element}",
             )
         return self.getLen() - 1
 

@@ -1,6 +1,6 @@
 from typing import List, Literal, Optional
-from app.classes.utils.singleton import SingletonMeta
 import logging
+from app.utils.singleton import SingletonMeta
 import colorlog
 import sys
 
@@ -33,6 +33,64 @@ light_cyan
 light_white
 
 """
+
+
+LOG_COLORS = Literal[
+    "black",
+    "red",
+    "green",
+    "yellow",
+    "blue",
+    "purple",
+    "cyan",
+    "white",
+    "reset",
+    # ================== LOGHT ====================
+    "light_black",
+    "light_red",
+    "light_green",
+    "light_yellow",
+    "light_blue",
+    "light_purple",
+    "light_cyan",
+    "light_white",
+    # ================== BOLD ====================
+    "bold_black",
+    "bold_red",
+    "bold_green",
+    "bold_yellow",
+    "bold_blue",
+    "bold_purple",
+    "bold_cyan",
+    "bold_white",
+    # ================== THIN ====================
+    "thin_black",
+    "thin_red",
+    "thin_green",
+    "thin_yellow",
+    "thin_blue",
+    "thin_purple",
+    "thin_cyan",
+    "thin_white",
+    # ================== FG ====================
+    "fg_black",
+    "fg_red",
+    "fg_green",
+    "fg_yellow",
+    "fg_blue",
+    "fg_purple",
+    "fg_cyan",
+    "fg_white",
+    # ================== BG ====================
+    "bg_black",
+    "bg_red",
+    "bg_green",
+    "bg_yellow",
+    "bg_blue",
+    "bg_purple",
+    "bg_cyan",
+    "bg_white",
+]
 
 
 class Logger(metaclass=SingletonMeta):
@@ -124,82 +182,34 @@ class Logger(metaclass=SingletonMeta):
         console_handler.setFormatter(self.formatter)
         self.logger.addHandler(console_handler)
 
-    # Решта методів Logger (debug, info, warning, error, critical, _print_colored_raw, delimetr)
-    # залишаються без змін, як у попередньому робочому варіанті.
-    # ... (скорочено для читабельності, переконайтесь, що вони присутні у вашому коді)
-
     def _log_with_temp_color(self, level, msg: str, color: Optional[str] = None):
         extra_kwargs = {}
         if color:
             extra_kwargs["extra"] = {"temp_log_color": color}
         self.logger.log(level, msg, **extra_kwargs)
 
-    def debug(self, msg: str, color: Optional[str] = None):
+    def debug(self, msg: str, color: Optional[LOG_COLORS] = None):
         self._log_with_temp_color(logging.DEBUG, msg, color)
 
-    def info(self, msg: str, color: Optional[str] = None):
+    def info(self, msg: str, color: Optional[LOG_COLORS] = None):
         self._log_with_temp_color(logging.INFO, msg, color)
 
-    def warning(self, msg: str, color: Optional[str] = None):
+    def warning(self, msg: str, color: Optional[LOG_COLORS] = None):
         self._log_with_temp_color(logging.WARNING, msg, color)
 
-    def error(self, msg: str, color: Optional[str] = None):
+    def error(self, msg: str, color: Optional[LOG_COLORS] = None):
         self._log_with_temp_color(logging.ERROR, msg, color)
 
-    def critical(self, msg: str, color: Optional[str] = None):
+    def critical(self, msg: str, color: Optional[LOG_COLORS] = None):
         self._log_with_temp_color(logging.CRITICAL, msg, color)
 
-    def _print_colored_raw(self, message: str, color: str):
-        temp_formatter = colorlog.ColoredFormatter(
-            f"%({color})s%(message)s%(reset)s",
-            log_colors={color: color},
-        )
-        temp_record = logging.LogRecord(
-            name="dummy",
-            level=logging.INFO,
-            pathname="<string>",
-            lineno=0,
-            msg=message,
-            args=(),
-            exc_info=None,
-            func="_print_colored_raw",
-        )
-        colored_output = temp_formatter.format(temp_record)
-        print(colored_output)
-
-    def delimetr(self, size: int = 79, color: str = "white", text: str = ""):
+    def delimetr(self, size: int = 100, color: LOG_COLORS = "white", text: str = ""):
         delimiter_char = "="
         base_delimiter_string = delimiter_char * size
 
         if text:
-            self._print_colored_raw(base_delimiter_string, color)
-            self._print_colored_raw(text, color)
-            self._print_colored_raw(base_delimiter_string, color)
+            self.info(base_delimiter_string, color)
+            self.info(text, color)
+            self.info(base_delimiter_string, color)
         else:
-            self._print_colored_raw(base_delimiter_string, color)
-
-
-if __name__ == "__main__":
-    try:
-        from app.classes.utils.singleton import SingletonMeta
-
-        class TempLogger(Logger, metaclass=SingletonMeta):
-            pass
-
-        logger = TempLogger()
-    except ImportError:
-        print(
-            "Warning: SingletonMeta not found, running Logger without it for example."
-        )
-        logger = Logger()
-
-    logger.info("Звичайне INFO повідомлення.")
-    logger.info("Це INFO повідомлення синього кольору.", color="blue")
-    logger.warning("Звичайне WARNING повідомлення.")
-    logger.error("Це ERROR повідомлення з жирним зеленим кольором.", color="bold_green")
-    logger.debug("Звичайне DEBUG повідомлення.")
-    logger.debug("Це DEBUG повідомлення з червоним фоном.", color="bg_red,white")
-
-    logger.delimetr(color="magenta")
-    logger.delimetr(text="Розділювач з текстом", color="yellow")
-    logger.info("Продовження виконання програми.")
+            self.info(base_delimiter_string, color)

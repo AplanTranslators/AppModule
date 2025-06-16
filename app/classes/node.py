@@ -1,15 +1,7 @@
 from enum import Enum, auto
 from typing import Tuple
-from classes.basic import Basic, BasicArray
-from classes.element_types import ElementsTypes
-from app.classes.utils.string_formater import addEqueToBGET
-from utils.utils import (
-    Color,
-    containsOnlyPipe,
-    is_interval_contained,
-    isNumericString,
-    printWithColor,
-)
+from app.classes.basic import Basic, BasicArray
+from app.classes.element_types import ElementsTypes
 
 
 class RangeTypes(Enum):
@@ -52,7 +44,7 @@ class Node(Basic):
         if self.range_selection == RangeTypes.END:
             result = "{0})".format(result)
         if self.bit_selection:
-            if isNumericString(self.identifier):
+            if self.utils.isNumericString(self.identifier):
                 result = "({0})".format(result)
             else:
                 result = ", {0})".format(result)
@@ -89,9 +81,8 @@ class NodeArray(BasicArray):
 
         self.elements.append(new_element)
         if not isinstance(new_element, Node):
-            printWithColor(
-                f"WARNING: Object should be of type {Node} but you passed an object of type {type(new_element)}. \n Object: {new_element}",
-                Color.YELLOW,
+            self.logger.warning(
+                f"Object should be of type {Node} but you passed an object of type {type(new_element)}. \n Object: {new_element}",
             )
         return self.getLen() - 1
 
@@ -150,13 +141,13 @@ class NodeArray(BasicArray):
             if index + 1 < len(self.elements):
                 next_element = self.getElementByIndex(index + 1)
                 if next_element.bit_selection:
-                    if isNumericString(next_element.identifier) is None:
+                    if self.utils.isNumericString(next_element.identifier) is None:
                         identifier = "BGET({0}".format(identifier)
 
             if self.element_type == ElementsTypes.PRECONDITION_ELEMENT:
-                identifier = addEqueToBGET(identifier)
+                identifier = self.string_formater.addEqueToBGET(identifier)
 
-            if containsOnlyPipe(identifier) and (
+            if self.utils.containsOnlyPipe(identifier) and (
                 previus_element.element_type is ElementsTypes.OPERATOR_ELEMENT
             ):
                 identifier = "{0} {1}".format(

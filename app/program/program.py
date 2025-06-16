@@ -1,15 +1,21 @@
-from app.classes.utils.logger import Logger
-from classes.declarations import DeclTypes, DeclarationArray
-from classes.element_types import ElementsTypes
-from app.classes.utils.singleton import SingletonMeta
-from classes.typedef import TypedefArray
-from classes.module import ModuleArray
-from classes.module_call import ModuleCallArray
+from app.utils.counters import Counters
+from app.utils.logger import Logger
+from app.utils.string_formater import StringFormater
+from app.program.beh import create_Beh_File
+from app.program.action import create_Action_File
+from app.program.env import create_ENV_File
+from app.program.evt import create_EVT_File
+from app.utils.singleton import SingletonMeta
+from app.classes.typedef import TypedefArray
+from app.classes.module import ModuleArray
+from app.classes.module_call import ModuleCallArray
 import os
 
 
 class Program(metaclass=SingletonMeta):
     logger = Logger()
+    str_formater = StringFormater()
+    counters = Counters()
 
     def __init__(self, path_to_result: str = None) -> None:
         self.path_to_result = path_to_result
@@ -34,7 +40,7 @@ class Program(metaclass=SingletonMeta):
         f.close()
         return data
 
-    def createResDir(self):
+    def create_result_dirrectory(self):
         if self.path_to_result is not None:
             last_char = self.path_to_result[-1]
             if last_char != os.sep:
@@ -49,151 +55,17 @@ class Program(metaclass=SingletonMeta):
         if not os.path.exists(self.path_to_result[:-1]):
             os.mkdir(self.path_to_result[:-1])
 
-    def writeToFile(self, path, data):
+    def write_to_file(self, path, data):
         f = open(path, "w")
         f.write(data)
         f.close()
 
-    def createEVT(self):
-        evt = "events(\n"
-        for module in self.modules.getElements():
-            for elem in module.declarations.getInputPorts():
-                evt += "\ts_{0}:obj(x1:{1});\n".format(
-                    elem.getName(), elem.getAplanDecltype()
-                )
-        evt += ");"
-        self.writeToFile(self.path_to_result + "project.evt_descript", evt)
-
-        printWithColor(".evt_descript file created \n", Color.PURPLE)
-
-    def createENV(self):
-        env = "environment (\n"  # Open env
-
-        # ----------------------------------
-        # Types
-        # ----------------------------------
-        env += "\ttypes : obj (\n"
-        sub_env = ""
-        decls = self.typedefs.getElementsIE()
-
-        for module in self.modules.getElements():
-            decls += module.typedefs.getElementsIE()
-
-        sub_env += str(decls)
-        if len(sub_env) > 0:
-            env += sub_env + "\n"
-        else:
-            env += "\t\t\tNil\n"
-        env += "\t);\n"
-
-        # ----------------------------------
-        # Attributes
-        # ----------------------------------
-
-        env += "\tattributes : obj (Nil);\n"
-
-        # ----------------------------------
-        # Agents types
-        # ----------------------------------
-
-        env += "\tagent_types : obj (\n"
-
-        for module in self.modules.getElementsIE(
-            exclude=ElementsTypes.OBJECT_ELEMENT
-        ).getElements():
-            env += "\t\t{0} : obj (\n".format(module.identifier)
-            sub_env = ""
-            decls = module.declarations.getElementsIE(
-                data_type_exclude=DeclTypes.ENUM_TYPE
-            )
-            for index, elem in enumerate(decls.getElements()):
-                if index > 0:
-                    sub_env += ",\n"
-                sub_env += "\t\t\t{0}:{1}".format(
-                    elem.getName(), elem.getAplanDecltype()
-                )
-                if index + 1 == decls.getLen():
-                    sub_env += "\n"
-            if len(sub_env) > 0:
-                env += sub_env
-            else:
-                env += "\t\t\tNil\n"
-            env += "\t\t),\n"
-        env += "\t\tENVIRONMENT:obj(Nil)\n"
-        env += "\t);\n"
-
-        # ----------------------------------
-        # Agents
-        # ----------------------------------
-        env += "\tagents : obj (\n"
-        for module in self.modules.getElementsIE(
-            exclude=ElementsTypes.CLASS_ELEMENT
-        ).getElements():
-            env += "\t\t{0} : obj ({1}),\n".format(
-                module.identifier, module.ident_uniq_name
-            )
-        env += "\t\tENVIRONMENT : obj (env)\n"
-        env += "\t);\n"
-
-        # ----------------------------------
-        # Axioms
-        # ----------------------------------
-        env += "\taxioms : obj (Nil);\n"
-
-        # ----------------------------------
-        # Logic formula
-        # ----------------------------------
-        env += "\tlogic_formula : obj (1)\n"
-        env += ");"  # Close env
-
-        self.writeToFile(self.path_to_result + "project.env_descript", env)
-        printWithColor(".env_descript file created \n", Color.PURPLE)
-
-    def createAction(self):
-        # ----------------------------------
-        # Actions
-        # ----------------------------------
-        actions = ""
-        for index, module in enumerate(
-            self.modules.getElementsIE(
-                exclude=ElementsTypes.OBJECT_ELEMENT
-            ).getElements()
-        ):
-            result = module.actions.getActionsInStrFormat()
-            if index != 0:
-                if len(result) > 0:
-                    actions += ",\n"
-            actions += result
-
-        self.writeToFile(self.path_to_result + "project.act", actions)
-        printWithColor(".act file created \n", Color.PURPLE)
-
-    def createBeh(self):
-        # ----------------------------------
-        # Behaviour
-        # ----------------------------------
-        behaviour = ""
-        for index, module in enumerate(
-            self.modules.getElementsIE(
-                exclude=ElementsTypes.OBJECT_ELEMENT
-            ).getElements()
-        ):
-            if index != 0:
-                behaviour += ",\n"
-            behaviour += f"{module.getBehInitProtocols()}"
-            behaviour += module.structures.getStructuresInStrFormat()
-
-            if module.isIncludeOutOfBlockElements():
-                behaviour += module.out_of_block_elements.getProtocolsInStrFormat()
-            else:
-                behaviour = removeTrailingComma(behaviour)
-                # behaviour += "\n"
-        self.writeToFile(self.path_to_result + "project.behp", behaviour)
-        printWithColor(".beh file created \n", Color.PURPLE)
-
-    def createAplanFiles(self):
-        self.createEVT()
-        self.createENV()
-        self.createAction()
-        self.createBeh()
-        printWithColor("The translation was successfully completed! \n", Color.ORANGE)
+    def create_aplan_files(self):
+        create_EVT_File(self)
+        create_ENV_File(self)
+        create_Action_File(self)
+        create_Beh_File(self)
+        self.logger.info(
+            "The translation was successfully completed! \n", "bold_yellow"
+        )
+        self.counters.deinit()

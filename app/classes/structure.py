@@ -1,10 +1,9 @@
 from typing import Tuple, List
-from classes.counters import CounterTypes
-from classes.parametrs import ParametrArray
-from classes.basic import Basic, BasicArray
-from classes.protocols import BodyElement, Protocol
-from classes.element_types import ElementsTypes
-from utils.utils import Counters_Object
+from app.utils.counters import CounterTypes
+from app.classes.parametrs import ParametrArray
+from app.classes.basic import Basic, BasicArray
+from app.classes.protocols import BodyElement, Protocol
+from app.classes.element_types import ElementsTypes
 
 
 class Structure(Basic):
@@ -90,12 +89,13 @@ class Structure(Basic):
         return len(self.behavior) - 1
 
     def addInitProtocol(self, counter_type: CounterTypes = CounterTypes.STRUCT_COUNTER):
+        cunter_value = self.counters.get(counter_type)
         self.addProtocol(
-            "{0}_{1}".format(self.identifier, Counters_Object.getCounter(counter_type)),
+            "{0}_{1}".format(self.identifier, cunter_value),
             element_type=self.element_type,
             parametrs=self.parametrs,
             inside_the_task=self.inside_the_task,
-            name_space_level=Counters_Object.getCounter(counter_type),
+            name_space_level=cunter_value,
         )
 
     def getBehLen(self):
@@ -194,7 +194,7 @@ class StructureArray(BasicArray):
             element.updateLinks(module)
 
     def getAlwaysList(self):
-        from classes.always import Always
+        from app.classes.always import Always
 
         result: List[Always] = []
         for element in self.elements:
@@ -203,7 +203,7 @@ class StructureArray(BasicArray):
         return result
 
     def getNoAlwaysStructures(self):
-        from classes.always import Always
+        from app.classes.always import Always
 
         result: List[Structure] = []
         for element in self.elements:

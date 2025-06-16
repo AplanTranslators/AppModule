@@ -1,12 +1,9 @@
 import re
 from typing import Tuple, List
 from enum import Enum, auto
-from classes.actions import Action
-from classes.basic import Basic, BasicArray
-from classes.element_types import ElementsTypes
-
-from app.classes.utils.string_formater import replaceValueParametrsCalls
-from utils.utils import extractVectorSize, vectorSize2AplanVectorSize
+from app.classes.actions import Action
+from app.classes.basic import Basic, BasicArray
+from app.classes.element_types import ElementsTypes
 
 
 class DeclTypes(Enum):
@@ -31,7 +28,7 @@ class DeclTypes(Enum):
     NONE = auto()
 
     def checkType(type_str: str, types):
-        from classes.module import Module
+        from app.classes.module import Module
 
         if "int" == type_str:
             return DeclTypes.INT

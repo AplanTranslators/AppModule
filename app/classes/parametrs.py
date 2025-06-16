@@ -1,7 +1,5 @@
-import re
-from typing import Tuple, List
-from classes.basic import Basic, BasicArray
-from app.classes.utils.string_formater import removeTrailingComma
+from typing import Tuple
+from app.classes.basic import Basic, BasicArray
 
 
 class Parametr(Basic):

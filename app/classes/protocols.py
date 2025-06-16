@@ -1,11 +1,9 @@
 import re
 from typing import Tuple, List
-from classes.parametrs import ParametrArray
-from classes.basic import Basic, BasicArray
+from app.classes.parametrs import ParametrArray
+from app.classes.basic import Basic, BasicArray
 
-from app.classes.utils.string_formater import removeTrailingComma
-from classes.element_types import ElementsTypes
-from utils.utils import extractFunctionName
+from app.classes.element_types import ElementsTypes
 
 
 class BodyElement(Basic):
@@ -167,7 +165,7 @@ class Protocol(Basic):
 
     def updateLinks(self, module):
         for index, element in enumerate(self.body.getElements()):
-            func_name = extractFunctionName(element.identifier)
+            func_name = self.utils.extractFunctionName(element.identifier)
             if func_name:
                 action = module.actions.findElement(func_name)
                 if action:
@@ -244,7 +242,7 @@ class ProtocolArray(BasicArray):
         for element in self.elements:
             result += "\n"
             result += str(element)
-        result = removeTrailingComma(result)
+        result = self.string_formater.removeTrailingComma(result)
         return result
 
     def __repr__(self):

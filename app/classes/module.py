@@ -1,18 +1,18 @@
-from classes.parametrs import ParametrArray
-from classes.processed import ProcessedElementArray
-from classes.actions import ActionArray
-from classes.typedef import TypedefArray
-from classes.value_parametrs import ValueParametrArray
-from classes.protocols import ProtocolArray
-from classes.declarations import DeclTypes, DeclarationArray
-from classes.structure import StructureArray
-from classes.basic import Basic, BasicArray
-from classes.module_call import ModuleCallArray
-from classes.element_types import ElementsTypes
+from app.classes.parametrs import ParametrArray
+from app.classes.processed import ProcessedElementArray
+from app.classes.actions import ActionArray
+from app.classes.typedef import TypedefArray
+from app.classes.value_parametrs import ValueParametrArray
+from app.classes.protocols import ProtocolArray
+from app.classes.declarations import DeclTypes, DeclarationArray
+from app.classes.structure import StructureArray
+from app.classes.basic import Basic, BasicArray
+from app.classes.module_call import ModuleCallArray
+from app.classes.element_types import ElementsTypes
 from typing import List, Tuple
 import re
 
-from classes.tasks import TaskArray
+from app.classes.tasks import TaskArray
 
 
 class Module(Basic):
@@ -241,7 +241,7 @@ class Module(Basic):
         init_protocols_array = self.declarations.getDeclarationsWithExpressions()
         init_flag = False
 
-        init_protocols_array.sort(key=lambda student: student.sequence)
+        init_protocols_array.sort(key=lambda prot: prot.sequence)
         for index, element in enumerate(init_protocols_array):
             if index != 0:
                 init_protocol += "."

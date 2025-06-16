@@ -1,7 +1,7 @@
 from typing import Tuple
-from classes.element_types import ElementsTypes
-from classes.protocols import BodyElementArray
-from classes.structure import Structure
+from app.classes.element_types import ElementsTypes
+from app.classes.protocols import BodyElementArray
+from app.classes.structure import Structure
 
 
 class IfStmt(Structure):

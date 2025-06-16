@@ -1,6 +1,6 @@
 from typing import Tuple, overload
-from classes.basic import Basic, BasicArray
-from classes.element_types import ElementsTypes
+from app.classes.basic import Basic, BasicArray
+from app.classes.element_types import ElementsTypes
 
 
 class ValueParametr(Basic):
@@ -23,7 +23,7 @@ class ValueParametr(Basic):
         return parametr
 
     def prepareExpression(self):
-        from app.classes.utils.string_formater import (
+        from app.utils.string_formater import (
             valuesToAplanStandart,
             doubleOperators2Aplan,
             addSpacesAroundOperators,
@@ -115,7 +115,7 @@ class ValueParametrArray(BasicArray):
             )
 
     def evaluateParametrExpressionByIndex(self, index: int):
-        from app.classes.utils.string_formater import replaceValueParametrsCalls
+        from app.utils.string_formater import replaceValueParametrsCalls
         from utils.utils import evaluateExpression
 
         parametr = self.getElementByIndex(index)
