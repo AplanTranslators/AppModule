@@ -1,0 +1,71 @@
+from app.utils.counters import Counters
+from app.utils.logger import Logger
+from app.utils.string_formater import StringFormater
+from app.program.beh import create_Beh_File
+from app.program.action import create_Action_File
+from app.program.env import create_ENV_File
+from app.program.evt import create_EVT_File
+from app.utils.singleton import SingletonMeta
+from app.classes.typedef import TypedefArray
+from app.classes.module import ModuleArray
+from app.classes.module_call import ModuleCallArray
+import os
+
+
+class Program(metaclass=SingletonMeta):
+    logger = Logger()
+    str_formater = StringFormater()
+    counters = Counters()
+
+    def __init__(self, path_to_result: str = None) -> None:
+        self.path_to_result = path_to_result
+        self.modules: ModuleArray = ModuleArray()
+        self._module_calls: ModuleCallArray = ModuleCallArray()
+        self._typedefs: TypedefArray = TypedefArray()
+
+    @property
+    def module_calls(self) -> ModuleCallArray:
+        return self._module_calls
+
+    @property
+    def typedefs(self) -> TypedefArray:
+        return self._typedefs
+
+    def readFileData(self, path):
+        self.file_path = path
+        self.logger.delimetr(color="blue", text=f"Read file {path}")
+
+        f = open(path, "r")
+        data = f.read()
+        f.close()
+        return data
+
+    def create_result_dirrectory(self):
+        if self.path_to_result is not None:
+            last_char = self.path_to_result[-1]
+            if last_char != os.sep:
+                self.path_to_result += os.sep
+        else:
+            self.path_to_result = "results" + os.sep
+
+        self.logger.info(
+            'Path to result: "{0}"\n'.format(self.path_to_result), "bold_yellow"
+        )
+
+        if not os.path.exists(self.path_to_result[:-1]):
+            os.mkdir(self.path_to_result[:-1])
+
+    def write_to_file(self, path, data):
+        f = open(path, "w")
+        f.write(data)
+        f.close()
+
+    def create_aplan_files(self):
+        create_EVT_File(self)
+        create_ENV_File(self)
+        create_Action_File(self)
+        create_Beh_File(self)
+        self.logger.info(
+            "The translation was successfully completed! \n", "bold_yellow"
+        )
+        self.counters.deinit()
