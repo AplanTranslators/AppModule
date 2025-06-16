@@ -1,5 +1,5 @@
 from typing import Tuple
-from app.classes.basic import Basic, BasicArray
+from ..classes.basic import Basic, BasicArray
 
 
 class Parametr(Basic):

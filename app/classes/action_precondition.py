@@ -1,5 +1,5 @@
 import re
-from app.classes.basic import Basic, BasicArray
+from ..classes.basic import Basic, BasicArray
 
 
 class ActionPrecondition(Basic):

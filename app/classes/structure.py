@@ -1,9 +1,9 @@
 from typing import Tuple, List
-from app.utils.counters import CounterTypes
-from app.classes.parametrs import ParametrArray
-from app.classes.basic import Basic, BasicArray
-from app.classes.protocols import BodyElement, Protocol
-from app.classes.element_types import ElementsTypes
+from ..utils.counters import CounterTypes
+from ..classes.parametrs import ParametrArray
+from ..classes.basic import Basic, BasicArray
+from ..classes.protocols import BodyElement, Protocol
+from ..classes.element_types import ElementsTypes
 
 
 class Structure(Basic):

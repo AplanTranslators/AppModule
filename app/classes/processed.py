@@ -1,7 +1,7 @@
 from typing import Tuple
-from app.classes.basic import Basic, BasicArray
+from ..classes.basic import Basic, BasicArray
 
-from app.classes.element_types import ElementsTypes
+from ..classes.element_types import ElementsTypes
 
 
 class ProcessedElement(Basic):

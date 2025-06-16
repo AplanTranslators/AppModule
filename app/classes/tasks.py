@@ -1,10 +1,10 @@
 import re
 from typing import Tuple, List
-from app.classes.parametrs import ParametrArray
-from app.classes.basic import Basic, BasicArray
-from app.classes.actions import ActionParts
-from app.classes.element_types import ElementsTypes
-from app.classes.structure import Structure
+from ..classes.parametrs import ParametrArray
+from ..classes.basic import Basic, BasicArray
+from ..classes.actions import ActionParts
+from ..classes.element_types import ElementsTypes
+from ..classes.structure import Structure
 
 
 class Task(Basic):

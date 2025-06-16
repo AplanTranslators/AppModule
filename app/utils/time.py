@@ -1,5 +1,5 @@
 import time
-from app.utils.singleton import SingletonMeta
+from ..utils.singleton import SingletonMeta
 
 
 class TimeUtils(metaclass=SingletonMeta):

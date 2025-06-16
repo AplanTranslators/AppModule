@@ -1,9 +1,9 @@
 from typing import List, Tuple
-from app.classes.element_types import ElementsTypes
-from app.utils.counters import Counters
-from app.utils.logger import Logger
-from app.utils.string_formater import StringFormater
-from app.utils.unsorted import UnsortedUnils
+from ..classes.element_types import ElementsTypes
+from ..utils.counters import Counters
+from ..utils.logger import Logger
+from ..utils.string_formater import StringFormater
+from ..utils.unsorted import UnsortedUnils
 
 
 class Basic:

@@ -2,15 +2,14 @@ import os
 import sys
 import time
 import traceback
-from typing import Literal
-from app.translator.base_translator_mngr import BaseTranslationManager
-from app.utils.file_manager import FilesMngr
-from app.utils.logger import Logger
-from app.program.program import Program
-from app.utils.time import TimeUtils
+from ..translator.base_translator_mngr import BaseTranslationManager
+from ..utils.file_manager import FilesMngr
+from ..utils.logger import Logger
+from ..program.program import Program
+from ..utils.time import TimeUtils
 
 
-class BaseTool():
+class BaseTool:
     logger = Logger()
     translation_mngr = BaseTranslationManager()
     time_utils = TimeUtils()

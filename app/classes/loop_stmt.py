@@ -1,7 +1,6 @@
 from typing import Tuple
-from app.classes.counters import CounterTypes
-from app.classes.element_types import ElementsTypes
-from app.classes.structure import Structure
+from ..classes.element_types import ElementsTypes
+from ..classes.structure import Structure
 
 
 class LoopStmt(Structure):

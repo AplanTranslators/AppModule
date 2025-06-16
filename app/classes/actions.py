@@ -1,9 +1,9 @@
 import re
 from typing import Tuple, List
-from app.classes.parametrs import Parametr, ParametrArray
-from app.classes.basic import Basic, BasicArray
-from app.classes.element_types import ElementsTypes
-from app.classes.node import NodeArray
+from ..classes.parametrs import Parametr, ParametrArray
+from ..classes.basic import Basic, BasicArray
+from ..classes.element_types import ElementsTypes
+from ..classes.node import NodeArray
 
 
 class ActionParts:

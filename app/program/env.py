@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING
 
-from app.classes.declarations import DeclTypes
+from ..classes.declarations import DeclTypes
 
-from app.classes.element_types import ElementsTypes
+from ..classes.element_types import ElementsTypes
 
 if TYPE_CHECKING:
     from program import Program

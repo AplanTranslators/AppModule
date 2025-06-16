@@ -1,6 +1,6 @@
 from typing import Tuple, overload
-from app.classes.basic import Basic, BasicArray
-from app.classes.element_types import ElementsTypes
+from ..classes.basic import Basic, BasicArray
+from ..classes.element_types import ElementsTypes
 
 
 class ValueParametr(Basic):
@@ -23,17 +23,6 @@ class ValueParametr(Basic):
         return parametr
 
     def prepareExpression(self):
-        from app.utils.string_formater import (
-            valuesToAplanStandart,
-            doubleOperators2Aplan,
-            addSpacesAroundOperators,
-            addBracketsAfterTilda,
-            addBracketsAfterNegation,
-            addLeftValueForUnaryOrOperator,
-            vectorSizes2AplanStandart,
-            generatePythonStyleTernary,
-            replace_cpp_operators,
-        )
 
         expression = valuesToAplanStandart(self.expression)
         expression = doubleOperators2Aplan(expression)

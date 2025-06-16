@@ -1,14 +1,14 @@
-from app.utils.counters import Counters
-from app.utils.logger import Logger
-from app.utils.string_formater import StringFormater
-from app.program.beh import create_Beh_File
-from app.program.action import create_Action_File
-from app.program.env import create_ENV_File
-from app.program.evt import create_EVT_File
-from app.utils.singleton import SingletonMeta
-from app.classes.typedef import TypedefArray
-from app.classes.module import ModuleArray
-from app.classes.module_call import ModuleCallArray
+from ..utils.counters import Counters
+from ..utils.logger import Logger
+from ..utils.string_formater import StringFormater
+from ..program.beh import create_Beh_File
+from ..program.action import create_Action_File
+from ..program.env import create_ENV_File
+from ..program.evt import create_EVT_File
+from ..utils.singleton import SingletonMeta
+from ..classes.typedef import TypedefArray
+from ..classes.module import ModuleArray
+from ..classes.module_call import ModuleCallArray
 import os
 
 

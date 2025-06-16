@@ -1,18 +1,18 @@
-from app.classes.parametrs import ParametrArray
-from app.classes.processed import ProcessedElementArray
-from app.classes.actions import ActionArray
-from app.classes.typedef import TypedefArray
-from app.classes.value_parametrs import ValueParametrArray
-from app.classes.protocols import ProtocolArray
-from app.classes.declarations import DeclTypes, DeclarationArray
-from app.classes.structure import StructureArray
-from app.classes.basic import Basic, BasicArray
-from app.classes.module_call import ModuleCallArray
-from app.classes.element_types import ElementsTypes
+from ..classes.parametrs import ParametrArray
+from ..classes.processed import ProcessedElementArray
+from ..classes.actions import ActionArray
+from ..classes.typedef import TypedefArray
+from ..classes.value_parametrs import ValueParametrArray
+from ..classes.protocols import ProtocolArray
+from ..classes.declarations import DeclTypes, DeclarationArray
+from ..classes.structure import StructureArray
+from ..classes.basic import Basic, BasicArray
+from ..classes.element_types import ElementsTypes
+from ..classes.tasks import TaskArray
 from typing import List, Tuple
 import re
 
-from app.classes.tasks import TaskArray
+
 
 
 class Module(Basic):

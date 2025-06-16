@@ -1,9 +1,9 @@
 import re
 from typing import Tuple, List
 from enum import Enum, auto
-from app.classes.actions import Action
-from app.classes.basic import Basic, BasicArray
-from app.classes.element_types import ElementsTypes
+from ..classes.actions import Action
+from ..classes.basic import Basic, BasicArray
+from ..classes.element_types import ElementsTypes
 
 
 class DeclTypes(Enum):

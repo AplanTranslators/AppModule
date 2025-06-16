@@ -1,5 +1,5 @@
 from typing import Tuple
-from app.classes.structure import Structure
+from ..classes.structure import Structure
 
 
 class Always(Structure):

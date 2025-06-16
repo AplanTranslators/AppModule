@@ -2,11 +2,11 @@ from ast import literal_eval
 import os
 import re
 from typing import TYPE_CHECKING
-from app.utils.logger import Logger
-from app.utils.singleton import SingletonMeta
+from ..utils.logger import Logger
+from ..utils.singleton import SingletonMeta
 
 if TYPE_CHECKING:
-    from app.classes.value_parametrs import ValueParametrArray
+    from ..classes.value_parametrs import ValueParametrArray
 
 
 class StringFormater(metaclass=SingletonMeta):

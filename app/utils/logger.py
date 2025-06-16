@@ -1,6 +1,6 @@
 from typing import List, Literal, Optional
 import logging
-from app.utils.singleton import SingletonMeta
+from ..utils.singleton import SingletonMeta
 import colorlog
 import sys
 

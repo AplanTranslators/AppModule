@@ -5,8 +5,8 @@ import sys
 import os
 from typing import Dict, List
 
-from app.utils.logger import Logger
-from app.utils.singleton import SingletonMeta
+from ..utils.logger import Logger
+from ..utils.singleton import SingletonMeta
 
 import glob
 

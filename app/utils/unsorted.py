@@ -1,6 +1,6 @@
 import re
-from app.utils.logger import Logger
-from app.utils.singleton import SingletonMeta
+from ..utils.logger import Logger
+from ..utils.singleton import SingletonMeta
 
 
 class UnsortedUnils(metaclass=SingletonMeta):

@@ -1,6 +1,6 @@
-from app.classes.basic import Basic, BasicArray
-from app.classes.element_types import ElementsTypes
-from app.classes.value_parametrs import ValueParametrArray
+from ..classes.basic import Basic, BasicArray
+from ..classes.element_types import ElementsTypes
+from ..classes.value_parametrs import ValueParametrArray
 import re
 
 

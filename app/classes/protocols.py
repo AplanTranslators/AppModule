@@ -1,9 +1,9 @@
 import re
 from typing import Tuple, List
-from app.classes.parametrs import ParametrArray
-from app.classes.basic import Basic, BasicArray
+from ..classes.parametrs import ParametrArray
+from ..classes.basic import Basic, BasicArray
 
-from app.classes.element_types import ElementsTypes
+from ..classes.element_types import ElementsTypes
 
 
 class BodyElement(Basic):
