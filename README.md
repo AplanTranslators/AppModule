@@ -48,13 +48,13 @@ For this tool you can have the same example file as for the Testing tool or run 
 ```python
     if __name__ == "__main__":
         tool = BaseTool() # Create Base tool object
-        tool.setType("sv") # Set the testing file type
+        tool.setType("sv") # Set the regeneration file type
         tool.regeneration_start(examples_list_path = "path to json file with examples data", )
 ```
 
 ```python
     if __name__ == "__main__":
         tool = BaseTool() # Create Base tool object
-        tool.setType("sv") # Set the testing file type
+        tool.setType("sv") # Set the regeneration file type
         tool.regeneration_start(path_to_sv = "path to exampe file")
 ```
