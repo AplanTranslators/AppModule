@@ -98,6 +98,7 @@ class Logger(metaclass=SingletonMeta):
     _temp_log_color: Optional[str] = None  # Для тимчасового кольору
 
     def __init__(self):
+        self.active = True
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.DEBUG)
 
@@ -182,6 +183,12 @@ class Logger(metaclass=SingletonMeta):
         console_handler.setFormatter(self.formatter)
         self.logger.addHandler(console_handler)
 
+    def activate(self):
+        self.active = True
+
+    def deactivate(self):
+        self.active = False
+
     def _log_with_temp_color(self, level, msg: str, color: Optional[str] = None):
         extra_kwargs = {}
         if color:
@@ -189,21 +196,29 @@ class Logger(metaclass=SingletonMeta):
         self.logger.log(level, msg, **extra_kwargs)
 
     def debug(self, msg: str, color: Optional[LOG_COLORS] = None):
-        self._log_with_temp_color(logging.DEBUG, msg, color)
+        if self.active:
+            self._log_with_temp_color(logging.DEBUG, msg, color)
 
     def info(self, msg: str, color: Optional[LOG_COLORS] = None):
-        self._log_with_temp_color(logging.INFO, msg, color)
+        if self.active:
+            self._log_with_temp_color(logging.INFO, msg, color)
 
     def warning(self, msg: str, color: Optional[LOG_COLORS] = None):
-        self._log_with_temp_color(logging.WARNING, msg, color)
+        if self.active:
+            self._log_with_temp_color(logging.WARNING, msg, color)
 
     def error(self, msg: str, color: Optional[LOG_COLORS] = None):
-        self._log_with_temp_color(logging.ERROR, msg, color)
+        if self.active:
+            self._log_with_temp_color(logging.ERROR, msg, color)
 
     def critical(self, msg: str, color: Optional[LOG_COLORS] = None):
-        self._log_with_temp_color(logging.CRITICAL, msg, color)
+        if self.active:
+            self._log_with_temp_color(logging.CRITICAL, msg, color)
 
     def delimetr(self, size: int = 100, color: LOG_COLORS = "white", text: str = ""):
+        if not self.active:
+            return
+
         delimiter_char = "="
         base_delimiter_string = delimiter_char * size
 

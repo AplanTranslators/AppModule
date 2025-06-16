@@ -1,7 +1,5 @@
 import re
-from typing import Tuple, List
 from app.classes.basic import Basic, BasicArray
-from app.utils.string_formater import removeTrailingComma
 
 
 class ActionPrecondition(Basic):
