@@ -6,12 +6,11 @@ from typing import Literal
 from app.translator.base_translator_mngr import BaseTranslationManager
 from app.utils.file_manager import FilesMngr
 from app.utils.logger import Logger
-from app.utils.singleton import SingletonMeta
 from app.program.program import Program
 from app.utils.time import TimeUtils
 
 
-class BaseTool(metaclass=SingletonMeta):
+class BaseTool():
     logger = Logger()
     translation_mngr = BaseTranslationManager()
     time_utils = TimeUtils()
