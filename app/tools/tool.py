@@ -11,9 +11,6 @@ from app.program.program import Program
 from app.utils.time import TimeUtils
 
 
-ToolTypes = Literal["SV", "VHDL"]
-
-
 class BaseTool(metaclass=SingletonMeta):
     logger = Logger()
     translation_mngr = BaseTranslationManager()
@@ -26,7 +23,7 @@ class BaseTool(metaclass=SingletonMeta):
         self.name = name
         pass
 
-    def setType(self, i_type: ToolTypes):
+    def setType(self, i_type):
         self._type = i_type
 
     def start(self, path, path_to_aplan_result):
@@ -136,7 +133,7 @@ class BaseTool(metaclass=SingletonMeta):
 
         for test_number, data in enumerate(all_examples):
             source_file = data["file"]
-            result_path = data["test_result_dir"]
+            result_path = data["result_dir"]
             aplan_code_path = data["aplan_dir"]
             if self.run_test(
                 test_number + 1, source_file, result_path, aplan_code_path
@@ -190,7 +187,7 @@ class BaseTool(metaclass=SingletonMeta):
             self.logger.delimetr(color="cyan")
         return result
 
-    def regeneration_start(self, examples_list_path, path_to_sv=None):
+    def regeneration_start(self, examples_list_path=None, path_to_sv=None):
         failed_generations = []
         self.logger.info(
             text="GENERATON START",
@@ -208,7 +205,7 @@ class BaseTool(metaclass=SingletonMeta):
             all_examples = self.file_manager.load_examples_from_json(examples_list_path)
             for test_number, data in enumerate(all_examples):
                 source_file = data["file"]
-                unused_path = data["test_result_dir"]
+                unused_path = data["result_dir"]
                 result_path = data["aplan_dir"]
                 if self.run_generation(test_number + 1, source_file, result_path):
                     failed_generations.append(test_number + 1)
