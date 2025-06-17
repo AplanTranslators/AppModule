@@ -186,6 +186,10 @@ class BaseTool:
         return result
 
     def regeneration_start(self, examples_list_path=None, path_to_sv=None):
+        if not examples_list_path and not path_to_sv:
+            self.logger.error("Please input path")
+            exit(1)
+
         failed_generations = []
         self.logger.delimetr(
             text="GENERATON START",
