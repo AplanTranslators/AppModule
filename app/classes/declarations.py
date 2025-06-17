@@ -28,7 +28,7 @@ class DeclTypes(Enum):
     NONE = auto()
 
     def checkType(type_str: str, types):
-        from app.classes.module import Module
+        from ..classes.module import Module
 
         if "int" == type_str:
             return DeclTypes.INT

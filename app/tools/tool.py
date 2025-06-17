@@ -160,7 +160,7 @@ class BaseTool:
 
     def run_generation(self, test_number, source_file, result_path):
         result = False
-        self.logger.info(
+        self.logger.delimetr(
             text=f"GENERATION {test_number}",
             color="purple",
         )
@@ -187,7 +187,7 @@ class BaseTool:
 
     def regeneration_start(self, examples_list_path=None, path_to_sv=None):
         failed_generations = []
-        self.logger.info(
+        self.logger.delimetr(
             text="GENERATON START",
             color="purple",
         )

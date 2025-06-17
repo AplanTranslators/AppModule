@@ -15,7 +15,7 @@ class StringFormater(metaclass=SingletonMeta):
     def __init__(self):
         pass
 
-    def removeTrailingComma(s: str) -> str:
+    def removeTrailingComma(self, s: str) -> str:
         """The function `removeTrailingComma` takes a string as input and removes any trailing commas from the
         end of the string.
 
@@ -33,7 +33,7 @@ class StringFormater(metaclass=SingletonMeta):
         """
         return s.rstrip(",")
 
-    def addEqueToBGET(expression: str):
+    def addEqueToBGET(self, expression: str):
         """The function `addEqueToBGET` takes an input expression, searches for the pattern "BGET(...)" within
         the expression, and replaces it with "BGET(...) == 1".
 
@@ -52,7 +52,9 @@ class StringFormater(metaclass=SingletonMeta):
         result = re.sub(pattern, r"\1 == 1", expression)
         return result
 
-    def replaceValueParametrsCalls(param_array: "ValueParametrArray", expression: str):
+    def replaceValueParametrsCalls(
+        self, param_array: "ValueParametrArray", expression: str
+    ):
         """The function `replaceValueParametrsCalls` replaces parameter calls in an expression with their
         corresponding values from a `ValueParametrArray`.
 
@@ -433,25 +435,3 @@ class StringFormater(metaclass=SingletonMeta):
             expression = re.sub(cpp_op, py_op, expression)
 
         return expression
-
-    def replace_filename(self, path: str, new_filename: str) -> str:
-        """The function `replace_filename` takes a file path and a new filename, and returns a new path with
-        the updated filename.
-
-        Parameters
-        ----------
-        path : str
-            The `path` parameter is a string representing the file path of the original file including the
-        filename.
-        new_filename : str
-            The `new_filename` parameter is a string that represents the new filename that you want to use for
-        the file in the given `path`.
-
-        Returns
-        -------
-            The function `replace_filename` returns a new path with the updated filename.
-
-        """
-        directory = os.path.dirname(path)
-        new_path = os.path.join(directory, new_filename)
-        return new_path

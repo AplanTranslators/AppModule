@@ -137,6 +137,7 @@ class UnsortedUnils(metaclass=SingletonMeta):
         return match.group(0) if match else None
 
     def dataTypeToStr(
+        self,
         ctx,
     ):
         result = None

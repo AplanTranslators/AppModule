@@ -98,3 +98,25 @@ class FilesMngr(metaclass=SingletonMeta):
             raise TypeError("JSON file should contain a list of example objects.")
 
         return data
+
+    def replace_filename(self, path: str, new_filename: str) -> str:
+        """The function `replace_filename` takes a file path and a new filename, and returns a new path with
+        the updated filename.
+
+        Parameters
+        ----------
+        path : str
+            The `path` parameter is a string representing the file path of the original file including the
+        filename.
+        new_filename : str
+            The `new_filename` parameter is a string that represents the new filename that you want to use for
+        the file in the given `path`.
+
+        Returns
+        -------
+            The function `replace_filename` returns a new path with the updated filename.
+
+        """
+        directory = os.path.dirname(path)
+        new_path = os.path.join(directory, new_filename)
+        return new_path

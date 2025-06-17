@@ -194,7 +194,7 @@ class StructureArray(BasicArray):
             element.updateLinks(module)
 
     def getAlwaysList(self):
-        from app.classes.always import Always
+        from ..classes.always import Always
 
         result: List[Always] = []
         for element in self.elements:
@@ -203,7 +203,7 @@ class StructureArray(BasicArray):
         return result
 
     def getNoAlwaysStructures(self):
-        from app.classes.always import Always
+        from ..classes.always import Always
 
         result: List[Structure] = []
         for element in self.elements:
