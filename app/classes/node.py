@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 from ..classes.basic import Basic, BasicArray
 from ..classes.element_types import ElementsTypes
 
@@ -168,25 +168,6 @@ class NodeArray(BasicArray):
         # `action_type` seems to represent the type of the overall operation this node array forms.
         self.action_type: ElementsTypes = ElementsTypes.NONE_ELEMENT
 
-        # Initialize utility objects (assuming they are passed or set up externally)
-        # These are crucial for getName and __str__ methods.
-        # Example: self.utils = Utils()
-        # Example: self.string_formater = StringFormatter()
-        # You need to ensure these are properly initialized where NodeArray is used.
-        if not hasattr(
-            self, "logger"
-        ):  # Ensure logger is initialized, possibly from BasicArray
-            from logging import getLogger
-
-            self.logger = getLogger(__name__)
-        # Placeholder for external utilities that are used in __str__
-        # You MUST ensure these are initialized or passed to the NodeArray instance
-        # if they are not coming from BasicArray or another base.
-        self.utils = None  # Placeholder: Must be assigned a suitable utility object
-        self.string_formater = (
-            None  # Placeholder: Must be assigned a suitable formatter object
-        )
-
     def isAssign(self) -> bool:
         """
         Checks if the `action_type` of this NodeArray indicates an assignment operation.
@@ -264,13 +245,14 @@ class NodeArray(BasicArray):
         Returns:
             str: The reconstructed expression string.
         """
-        result = ""
-        negation_operators = (
-            "~!"  # Operators that might require surrounding parentheses
-        )
-        bracket_flag = False  # Flag to track if an opening parenthesis was added
+        result_parts: List[str] = (
+            []
+        )  # Using a list of parts for efficient string building
+        # Unary operators that typically do not have a space between them and their operand
+        unary_operators = {"~", "!"}
+        bracket_flag = False  # Flag to track open parentheses after unary operators
 
-        # Ensure utility objects are available
+        # Check for the presence of required utility objects
         if self.utils is None:
             self.logger.error(
                 "NodeArray.utils is not initialized. Cannot format string."
@@ -283,116 +265,129 @@ class NodeArray(BasicArray):
             return "<Error: string_formater not initialized>"
 
         for index, element in enumerate(self.elements):
-            previous_element: Optional[Basic] = None
+            current_node: Node = element
+            previous_node: Optional[Node] = None
             if index > 0:
-                previous_element = self.elements[index - 1]
+                previous_node = self.elements[index - 1]
 
-            # Logic to close a bracket if `bracket_flag` is set and current element is an operator
-            if bracket_flag and element.element_type is ElementsTypes.OPERATOR_ELEMENT:
-                result += ")"
-                bracket_flag = False
-
-            # Determine if a space should be added before the current element
-            if index != 0:  # For all elements except the first one
-                if (
-                    element.element_type is ElementsTypes.DOT_ELEMENT
-                    or element.element_type is ElementsTypes.SEMICOLON_ELEMENT
-                ):
-                    # No space before dot or semicolon
-                    pass
-                elif previous_element:  # Check if previous_element exists
-                    if previous_element.element_type is ElementsTypes.DOT_ELEMENT:
-                        # No space after dot
-                        pass
-                    elif (
-                        element.bit_selection
-                        or element.range_selection == RangeTypes.START_END
-                        or element.range_selection == RangeTypes.START
-                        or element.range_selection == RangeTypes.END
-                    ):
-                        # No space if current element is part of a bit/range selection
-                        pass
-                    else:
-                        # General case: add space unless special conditions apply
-                        if (
-                            "(" not in element.identifier and previous_element
-                        ):  # Check previous_element
-                            if previous_element.identifier in negation_operators:
-                                # Add opening parenthesis after a negation operator
-                                result += "("
-                                bracket_flag = True
-                            elif (
-                                "(" in previous_element.identifier
-                                or ")" in element.identifier
-                            ):
-                                # No space if parentheses are involved
-                                pass
-                            else:
-                                result += " "  # Default: add a space
-                        else:
-                            result += " "  # Add space if current identifier contains '(' (e.g., function call)
-
-            # Get the formatted name of the current node
-            current_identifier_str = element.getName()
-
-            # Apply specific formatting based on element type
-            if element.element_type is ElementsTypes.ARRAY_ELEMENT:
-                current_identifier_str += ".value"
-            elif element.element_type is ElementsTypes.ARRAY_SIZE_ELEMENT:
-                current_identifier_str += ".size"
-
-            # Check for bit selection formatting for the NEXT element
-            if index + 1 < len(self.elements):
-                next_element: Node = self.elements[
-                    index + 1
-                ]  # Type hint for next_element
-                if next_element.bit_selection:
-                    # Check if the next element's identifier is NOT a numeric string (e.g., it's a variable)
-                    if self.utils.isNumericString(next_element.identifier) is None:
-                        current_identifier_str = f"BGET({current_identifier_str}"  # Wrap current in BGET if next is bit select
-
-            # Apply specific formatting for precondition elements
-            if self.node_type == ElementsTypes.PRECONDITION_ELEMENT:
-                current_identifier_str = self.string_formater.addEqueToBGET(
-                    current_identifier_str
-                )
-
-            # Special handling for pipe-only identifier if previous was an operator
+            # 1. Logic for closing parentheses if `bracket_flag` is set and the current element is an operator
+            # This is generally for closing parentheses opened after a unary operator
             if (
-                self.utils.containsOnlyPipe(current_identifier_str)
-                and previous_element
-                and previous_element.element_type is ElementsTypes.OPERATOR_ELEMENT
+                bracket_flag
+                and current_node.element_type is ElementsTypes.OPERATOR_ELEMENT
             ):
-                # This complex condition suggests a very specific syntax where a leading element
-                # (e.g., the target of an assignment) is prepended to a pipe-only operator.
-                # Assumes self.getElementByIndex(0) is valid and returns a Node.
-                first_element_name = self.elements[0].getName()
-                current_identifier_str = (
-                    f"{first_element_name} {current_identifier_str}"
-                )
-
-            # Handle increment/decrement operators (e.g., ++, --)
-            if "++" in str(element.identifier) and previous_element:
-                result += f"= {previous_element.getName()} + 1"
-            elif "--" in str(element.identifier) and previous_element:
-                result += f"= {previous_element.getName()} - 1"
-            else:
-                # Default case: append the formatted identifier
-                if element.element_type is ElementsTypes.SEMICOLON_ELEMENT:
-                    # If it's a semicolon and not the very last element, add a newline and indent
-                    if index != len(self) - 1:
-                        result += f"{current_identifier_str}\n\t\t"
-                    else:
-                        result += current_identifier_str  # No newline for the very last semicolon
-                else:
-                    result += current_identifier_str
-
-            # Close any pending opening bracket at the very end of the expression
-            if bracket_flag and index == len(self.elements) - 1:
-                result += ")"
+                result_parts.append(")")
                 bracket_flag = False
 
-        return result
+            # --- Start of improved space handling logic ---
+            # 2. Logic for adding spaces between elements
+            if index > 0:  # Add a space before all elements except the first one
+                # Special cases where NO space is added before the current element
+                if (
+                    current_node.element_type is ElementsTypes.DOT_ELEMENT
+                    or current_node.element_type is ElementsTypes.SEMICOLON_ELEMENT
+                    or current_node.bit_selection  # e.g., `array[index]` no space between array and [
+                    or current_node.range_selection
+                    in {
+                        RangeTypes.START_END,
+                        RangeTypes.START,
+                        RangeTypes.END,
+                    }  # e.g., `signal[msb:lsb]` no space between signal and [
+                    or (
+                        current_node.identifier == "("
+                        and previous_node
+                        and previous_node.element_type
+                        is ElementsTypes.IDENTIFIER_ELEMENT
+                    )  # Function call: `func(`
+                ):
+                    pass  # No space
+                # Special cases where NO space is added AFTER the previous element
+                elif (
+                    previous_node
+                    and previous_node.element_type is ElementsTypes.DOT_ELEMENT
+                    or (
+                        previous_node and previous_node.identifier in unary_operators
+                    )  # Unary operator: `!signal`
+                ):
+                    pass  # No space
+                else:
+                    # Default: add a space
+                    result_parts.append(" ")
+
+                # Specific logic for opening parentheses after unary operators.
+                # This should only happen IF the previous_node was a unary operator AND we *didn't* add a space.
+                # It's crucial this check happens *after* determining if a space is needed.
+                if (
+                    previous_node
+                    and previous_node.identifier in unary_operators
+                    and not bracket_flag
+                ):
+                    # Only add '(' if it's not already part of current_node's identifier (e.g., current_node is already a function call)
+                    if "(" not in current_node.identifier:
+                        result_parts.append("(")
+                        bracket_flag = True
+            # --- End of improved space handling logic ---
+
+            # 3. Get the formatted name of the current node
+            formatted_identifier = current_node.getName()
+
+            # 4. Apply specific formatting based on element type
+            if current_node.element_type is ElementsTypes.ARRAY_ELEMENT:
+                formatted_identifier += ".value"
+            elif current_node.element_type is ElementsTypes.ARRAY_SIZE_ELEMENT:
+                formatted_identifier += ".size"
+
+            # 5. Handle bit-selection formatting for the NEXT element (if current is part of BGET)
+            if index + 1 < len(self.elements):
+                next_node: Node = self.elements[index + 1]
+                if next_node.bit_selection:
+                    if self.utils.isNumericString(next_node.identifier) is None:
+                        formatted_identifier = f"BGET({formatted_identifier}"
+
+            # 6. Apply specific formatting for PRECONDITION_ELEMENT type
+            if self.node_type == ElementsTypes.PRECONDITION_ELEMENT:
+                formatted_identifier = self.string_formater.addEqueToBGET(
+                    formatted_identifier
+                )
+
+            # 7. Special handling for a 'pipe-only' identifier (|) after an operator
+            if (
+                self.utils.containsOnlyPipe(formatted_identifier)
+                and previous_node
+                and previous_node.element_type is ElementsTypes.OPERATOR_ELEMENT
+            ):
+                first_element_name = self.elements[0].getName()
+                formatted_identifier = f"{first_element_name} {formatted_identifier}"
+
+            # 8. Handle increment/decrement operators (++, --)
+            if "++" in str(current_node.identifier) and previous_node:
+                # These are usually post-increment/decrement,
+                # so the previous element's name is the operand.
+                # The '++' or '--' token itself shouldn't directly appear as part of the output,
+                # but rather converted to a `+1` or `-1` assignment.
+                # We need to ensure no space was added just before the '++' or '--'
+                if result_parts and result_parts[-1] == " ":
+                    result_parts.pop()  # Remove the last added space if there was one
+                result_parts.append(f"= {previous_node.getName()} + 1")
+            elif "--" in str(current_node.identifier) and previous_node:
+                if result_parts and result_parts[-1] == " ":
+                    result_parts.pop()  # Remove the last added space if there was one
+                result_parts.append(f"= {previous_node.getName()} - 1")
+            else:
+                # 9. General case: append the formatted identifier
+                if current_node.element_type is ElementsTypes.SEMICOLON_ELEMENT:
+                    if index != len(self.elements) - 1:
+                        result_parts.append(f"{formatted_identifier}\n\t\t")
+                    else:
+                        result_parts.append(formatted_identifier)
+                else:
+                    result_parts.append(formatted_identifier)
+
+        # 10. Close any pending open parentheses at the very end of the expression
+        if bracket_flag:
+            result_parts.append(")")
+
+        return "".join(result_parts)
 
     def getElementByIndex(self, index: int) -> Node:
         """
