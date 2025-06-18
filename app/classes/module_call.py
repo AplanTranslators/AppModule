@@ -1,3 +1,4 @@
+from typing import List, Optional, Tuple
 from ..classes.basic import Basic, BasicArray
 from ..classes.element_types import ElementsTypes
 from ..classes.value_parametrs import ValueParametrArray
@@ -5,54 +6,157 @@ import re
 
 
 class ModuleCall(Basic):
-    def extractParametrsAndValues(self, expression):
-        result = []
-        matches = re.findall(r"\.(.+?)\b\s*\((.+?)\)", expression)
-        for element in matches:
-            result.append(element)
+    """
+    Represents an instance of a module call (instantiation) in a hardware description
+    language (HDL) context (e.g., SystemVerilog module instantiation).
 
+    This class encapsulates information about the module being instantiated,
+    the name of the instance, and how its parameters are connected.
+    It extends `Basic` for fundamental properties like identifier and source interval.
+    """
+
+    @staticmethod
+    def extractParametrsAndValues(expression: str) -> List[Tuple[str, str]]:
+        """
+        Extracts parameter-value assignments from a given string expression.
+        It looks for patterns like ".parameter_name(value_expression)".
+
+        Args:
+            expression (str): The string containing parameter assignments,
+                              e.g., ".WIDTH(SOURCE_WIDTH), .DEPTH(LOCAL_DEPTH)".
+
+        Returns:
+            List[Tuple[str, str]]: A list of tuples, where each tuple contains
+                                   (parameter_name, value_expression).
+        """
+        result: List[Tuple[str, str]] = []
+        # Regex to find '.PARAM_NAME(VALUE_EXPRESSION)' patterns.
+        # Captures PARAM_NAME and VALUE_EXPRESSION.
+        # \b ensures word boundary for parameter name.
+        matches = re.findall(r"\.([a-zA-Z_][a-zA-Z0-9_]*)\s*\((.+?)\)", expression)
+        for param_name, value_expr in matches:
+            result.append((param_name, value_expr))
         return result
 
     def __init__(
         self,
-        identifier: str,
-        object_name: str,
-        source_identifier: str,
-        destination_identifier: str,
-        parameter_value_assignment: str | None = None,
-        source_parametrs: ValueParametrArray | None = None,
+        identifier: str,  # The unique name of this module *instance*
+        object_name: str,  # The name of the *module definition* being called (e.g., 'my_module' in `my_module instance_name(...)`)
+        source_identifier: str,  # The identifier from the source definition (e.g., module name)
+        destination_identifier: str,  # The identifier in the destination context (e.g., instance name)
+        parameter_value_assignment: Optional[str] = None,
+        source_parametrs: Optional[ValueParametrArray] = None,
     ):
+        """
+        Initializes a new `ModuleCall` instance.
+
+        Args:
+            identifier (str): The unique identifier for this module *instance* (e.g., "U1" or "my_instance").
+                              This is also passed to the `Basic` parent.
+            object_name (str): The name of the module *definition* being instantiated (e.g., "my_adder").
+            source_identifier (str): The identifier of the source component (likely the module being instantiated).
+                                     This might be redundant with `object_name` depending on context,
+                                     but kept for original intent.
+            destination_identifier (str): The identifier of the destination component.
+                                          This is often the same as `identifier` but could differ.
+            parameter_value_assignment (Optional[str]): A string containing the
+                                                        parameter assignments for this call,
+                                                        e.g., ".WIDTH(8), .DEPTH(16)". Defaults to None.
+            source_parametrs (Optional[ValueParametrArray]): An array of available source parameters
+                                                              to resolve values during assignment.
+                                                              Defaults to None.
+        """
+        # Call the parent `Basic` constructor.
+        # The source_interval (0,0) suggests that ModuleCall instances might not always
+        # have a direct textual span, or it's implicitly handled elsewhere.
         super().__init__(
-            identifier,
-            (0, 0),
-        )
-        self.object_name = object_name
-        self.source_identifier = source_identifier
-        self.destination_identifier = destination_identifier
+            identifier, (0, 0), element_type=ElementsTypes.MODULE_CALL_ELEMENT
+        )  # Added element_type
+
+        self.object_name: str = object_name
+        self.source_identifier: str = source_identifier
+        self.destination_identifier: str = destination_identifier
+
+        # `paramets` stores `ValueParametr` objects that are associated with this module call.
         self.paramets: ValueParametrArray = ValueParametrArray()
+
+        # If parameter assignments and source parameters are provided, process them.
         if parameter_value_assignment is not None and source_parametrs is not None:
-            parametrs_for_assignment = self.extractParametrsAndValues(
+            # Extract parameter name and value expression pairs from the assignment string.
+            params_for_assignment = self.extractParametrsAndValues(
                 parameter_value_assignment
             )
-            for left, right in parametrs_for_assignment:
-                source_parametr = source_parametrs.getElement(right)
+            # Iterate through extracted assignments
+            for target_param_name, source_value_expr in params_for_assignment:
+                # Attempt to find the source parameter (by its value expression)
+                # in the provided `source_parametrs` array.
+                source_parametr = source_parametrs.getElement(source_value_expr)
                 if source_parametr is not None:
+                    # If found, add the resolved source parameter to this module call's parameters.
                     self.paramets.addElement(source_parametr)
 
-    def __repr__(self):
-        return "\tModuleCall(\n\t\t{0},\n\t\t{1},\n\t\t{2},\n\t\t{3}\n\t)\n".format(
-            self.identifier,
-            self.source_identifier,
-            self.destination_identifier,
-            self.paramets,
+    def __repr__(self) -> str:
+        """
+        Returns a developer-friendly string representation of the `ModuleCall` object.
+        This provides a detailed view of its state for debugging and inspection.
+        """
+        return (
+            f"ModuleCall(\n"
+            f"\tidentifier={self.identifier!r},\n"
+            f"\tobject_name={self.object_name!r},\n"
+            f"\tsource_identifier={self.source_identifier!r},\n"
+            f"\tdestination_identifier={self.destination_identifier!r},\n"
+            f"\tparameters={self.paramets!r},\n"  # Use __repr__ of ValueParametrArray
+            f"\tsequence={getattr(self, 'sequence', 'N/A')!r}\n"
+            f")"
+        )
+
+    def __str__(self) -> str:
+        """
+        Returns a human-readable string representation of the `ModuleCall` object.
+        This provides a concise summary of the module instantiation.
+        """
+        params_str = ""
+        if len(self.paramets) > 0:
+            params_str = ", ".join(
+                str(p) for p in self.paramets.getElements()
+            )  # Assumes ValueParametr has a __str__
+            params_str = f" #(.{params_str})"
+
+        return (
+            f"{self.object_name} {self.identifier}{params_str} (\n"
+            f"  // connections would go here\n"
+            f");"
         )
 
 
 class ModuleCallArray(BasicArray):
+    """
+    A specialized array for managing a collection of `ModuleCall` objects.
+    This class extends `BasicArray` and provides specific methods for
+    finding and filtering module calls within a design.
+    """
+
     def __init__(self):
+        """
+        Initializes a new `ModuleCallArray` instance, specifically configured
+        to store objects of type `ModuleCall`.
+        """
         super().__init__(ModuleCall)
 
-    def findModuleByUniqIdentifier(self, object_name: str):
+    def findModuleByUniqIdentifier(self, object_name: str) -> Optional[ModuleCall]:
+        """
+        Finds a `ModuleCall` object based on the unique name of the module *definition*
+        being instantiated (`object_name`).
+
+        Args:
+            object_name (str): The name of the module definition (e.g., "my_adder")
+                               to search for among the instantiated modules.
+
+        Returns:
+            Optional[ModuleCall]: The first `ModuleCall` object found that instantiates
+                                   a module with the given `object_name`, or `None` if not found.
+        """
         for element in self.elements:
             if element.object_name == object_name:
                 return element
@@ -60,36 +164,91 @@ class ModuleCallArray(BasicArray):
 
     def getElementsIE(
         self,
-        include: ElementsTypes | None = None,
-        exclude: ElementsTypes | None = None,
-        include_identifier: str | None = None,
-        exclude_identifier: str | None = None,
-    ):
-        result: ModuleCallArray = ModuleCallArray()
-        elements = self.elements
+        include: Optional[ElementsTypes] = None,
+        exclude: Optional[ElementsTypes] = None,
+        include_identifier: Optional[str] = None,
+        exclude_identifier: Optional[str] = None,
+    ) -> "ModuleCallArray":
+        """
+        Filters and retrieves `ModuleCall` elements based on specified inclusion/exclusion criteria.
+        This method primarily supports filtering by `ElementsTypes` and instance identifiers.
 
-        if include is None and exclude is None:
-            return self.copy()
+        Args:
+            include (Optional[ElementsTypes]): If provided, only include module calls
+                                               of this specific `ElementsTypes`.
+            exclude (Optional[ElementsTypes]): If provided, exclude module calls
+                                               of this specific `ElementsTypes`.
+            include_identifier (Optional[str]): If provided, only include module calls
+                                                matching this instance identifier.
+            exclude_identifier (Optional[str]): If provided, exclude module calls
+                                                matching this instance identifier.
 
-        for element in elements:
-            if include is not None and element.element_type is not include:
-                continue
+        Returns:
+            ModuleCallArray: A new `ModuleCallArray` containing only the filtered elements.
+                              Returns a deep copy of the original array if no filters are applied.
+        """
+        result_array: ModuleCallArray = ModuleCallArray()
+
+        # If no filters are specified, return a deep copy of all elements for consistency.
+        if all(
+            arg is None
+            for arg in [include, exclude, include_identifier, exclude_identifier]
+        ):
+            return self.copy()  # Use the copy method to ensure deep copy
+
+        for element in self.elements:
+            # Apply exclusion filters first
             if exclude is not None and element.element_type is exclude:
                 continue
             if (
-                include_identifier is not None
-                and element.identifier is not include_identifier
+                exclude_identifier is not None
+                and element.identifier == exclude_identifier
             ):
+                continue
+
+            # Apply inclusion filters
+            if include is not None and element.element_type is not include:
                 continue
             if (
-                exclude_identifier is not None
-                and element.identifier is exclude_identifier
+                include_identifier is not None
+                and element.identifier != include_identifier
             ):
                 continue
 
-            result.addElement(element)
+            # If the element passes all filters, add it to the result.
+            result_array.addElement(element)
 
-        return result
+        return result_array
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        Returns a developer-friendly string representation of the `ModuleCallArray` object.
+        This is useful for debugging and provides a clear view of the array's contents.
+        """
         return f"ModuleCallArray(\n{self.elements!r}\n)"
+
+    def __str__(self) -> str:
+        """
+        Returns a human-readable string representation of the `ModuleCallArray`.
+        Each module call is represented on a new line.
+        """
+        return "\n".join(str(call) for call in self.elements)
+
+    def __iter__(self):
+        """
+        Makes the `ModuleCallArray` iterable, allowing direct iteration over its elements
+        (e.g., `for call in my_module_calls:`).
+        """
+        return iter(self.elements)
+
+    def __getitem__(self, index: int) -> ModuleCall:
+        """
+        Enables direct access to elements using square brackets (e.g., `my_array[0]`).
+
+        Args:
+            index (int): The index of the element to retrieve.
+
+        Returns:
+            ModuleCall: The `ModuleCall` object at the specified index.
+        """
+        return self.elements[index]
