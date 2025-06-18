@@ -59,11 +59,11 @@ class TaskArray(BasicArray):
             new_aray.addElement(element.copy())
         return new_aray
 
-    def findElement(
+    def getElement(
         self,
         identifier: str,
     ) -> Task | None:
-        return super().findElement(identifier)
+        return super().getElement(identifier)
 
     def getElementsIE(
         self,

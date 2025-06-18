@@ -69,7 +69,7 @@ class NodeArray(BasicArray):
         return False
 
     # def InitAssign(self):
-    #     if self.isAssign() and self.getLen() == 1:
+    #     if self.isAssign() and len(self) == 1:
     #         self.elements.append(Node("=", (0, 0), ElementsTypes.OPERATOR_ELEMENT))
 
     def addElement(self, new_element: Basic):
@@ -77,14 +77,14 @@ class NodeArray(BasicArray):
             element = self.getLastElement()
             if element:
                 if not self.checkSourceInteval(new_element.source_interval):
-                    return self.getLen() - 1
+                    return len(self) - 1
 
         self.elements.append(new_element)
         if not isinstance(new_element, Node):
             self.logger.warning(
                 f"Object should be of type {Node} but you passed an object of type {type(new_element)}. \n Object: {new_element}",
             )
-        return self.getLen() - 1
+        return len(self) - 1
 
     def __str__(self) -> str:
         result = ""
@@ -162,7 +162,7 @@ class NodeArray(BasicArray):
 
             else:
                 if element.element_type is ElementsTypes.SEMICOLON_ELEMENT:
-                    if index != self.getLen() - 1:
+                    if index != len(self) - 1:
                         result += f"{identifier}\n\t\t"
                 else:
                     result += identifier

@@ -50,7 +50,7 @@ def create_ENV_File(self: "Program"):
             if index > 0:
                 sub_env += ",\n"
             sub_env += "\t\t\t{0}:{1}".format(elem.getName(), elem.getAplanDecltype())
-            if index + 1 == decls.getLen():
+            if index + 1 == len(decls):
                 sub_env += "\n"
         if len(sub_env) > 0:
             env += sub_env

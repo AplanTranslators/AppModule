@@ -13,8 +13,6 @@ from typing import List, Tuple
 import re
 
 
-
-
 class Module(Basic):
     def __init__(
         self,
@@ -154,7 +152,7 @@ class Module(Basic):
 
     def getInputParametrs(self):
         result = ""
-        if self.input_parametrs.getLen() > 0:
+        if len(self.input_parametrs) > 0:
             result = f"({str(self.input_parametrs)})"
         return result
 

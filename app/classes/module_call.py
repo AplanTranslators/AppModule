@@ -35,7 +35,7 @@ class ModuleCall(Basic):
                 parameter_value_assignment
             )
             for left, right in parametrs_for_assignment:
-                source_parametr = source_parametrs.findElement(right)
+                source_parametr = source_parametrs.getElement(right)
                 if source_parametr is not None:
                     self.paramets.addElement(source_parametr)
 

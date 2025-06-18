@@ -53,7 +53,7 @@ class Structure(Basic):
         if params_include == True:
             if self.additional_params is not None:
                 identifier = "{0}({1})".format(identifier, self.additional_params)
-            elif self.parametrs.getLen() > 0:
+            elif len(self.parametrs) > 0:
                 identifier = "{0}({1})".format(identifier, str(self.parametrs))
         return identifier
 
@@ -101,15 +101,6 @@ class Structure(Basic):
     def getBehLen(self):
         return len(self.behavior)
 
-    # def getName(self):
-    #     identifier = self.identifier
-    #     if self.number:
-    #         identifier = "{0}_{1}".format(identifier, self.number)
-    #     if self.parametrs.getLen() > 0:
-    #         identifier = "{0}({1})".format(identifier, str(self.parametrs))
-
-    #     return identifier
-
     def __str__(self):
         result = ""
         # if len(self.behavior) >= 1:
@@ -140,7 +131,7 @@ class StructureArray(BasicArray):
 
     def addElement(self, new_element: Structure):
         if isinstance(new_element, self.element_type):
-            is_uniq_element = self.findElement(new_element.identifier)
+            is_uniq_element = self.getElement(new_element.identifier)
             if is_uniq_element is not None:
                 return (False, self.getElementIndex(is_uniq_element.identifier))
 
@@ -216,8 +207,9 @@ class StructureArray(BasicArray):
         return result
 
     def getLastElement(self) -> Structure | None:
-        if self.getLen() > 0:
-            return self.elements[self.getLen() - 1]
+
+        if len(self) > 0:
+            return self.elements[len(self) - 1]
         else:
             return None
 

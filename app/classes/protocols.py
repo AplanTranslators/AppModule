@@ -27,7 +27,7 @@ class BodyElement(Basic):
 
     def getName(self):
         if self.parametrs:
-            if self.parametrs.getLen() == 0:
+            if len(self.parametrs) == 0:
                 return self.identifier
             else:
                 return "{0}({1})".format(self.identifier, str(self.parametrs))
@@ -52,7 +52,7 @@ class BodyElementArray(BasicArray):
 
     def addElement(self, new_element: BodyElement):
         self.elements.append(new_element)
-        return self.getLen() - 1
+        return len(self) - 1
 
     def getElements(self):
         return self.elements
@@ -158,7 +158,7 @@ class Protocol(Basic):
         identifier = self.identifier
         if self.number:
             identifier = "{0}_{1}".format(identifier, self.number)
-        if self.parametrs.getLen() > 0:
+        if len(self.parametrs) > 0:
             identifier = "{0}({1})".format(identifier, str(self.parametrs))
 
         return identifier
@@ -167,7 +167,7 @@ class Protocol(Basic):
         for index, element in enumerate(self.body.getElements()):
             func_name = self.utils.extractFunctionName(element.identifier)
             if func_name:
-                action = module.actions.findElement(func_name)
+                action = module.actions.getElement(func_name)
                 if action:
                     self.body[index] = (
                         action,

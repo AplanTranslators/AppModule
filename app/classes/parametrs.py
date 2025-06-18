@@ -48,7 +48,7 @@ class ParametrArray(BasicArray):
 
     def addElement(self, new_element: Parametr):
         if isinstance(new_element, self.element_type):
-            is_uniq_element = self.findElement(new_element.identifier)
+            is_uniq_element = self.getElement(new_element.identifier)
             if is_uniq_element is not None:
                 return (False, self.getElementIndex(is_uniq_element.identifier))
 
@@ -77,7 +77,7 @@ class ParametrArray(BasicArray):
 
     def getIdentifiersListString(self, parametrs_count):
         result = ""
-        if parametrs_count <= self.getLen():
+        if parametrs_count <= len(self):
             for index in range(parametrs_count):
                 if index == 0:
                     result += "("
@@ -85,11 +85,11 @@ class ParametrArray(BasicArray):
                 if index != 0:
                     result += ", "
                 result += self.elements[index].identifier
-                if index == self.getLen() - 1:
+                if index == len(self) - 1:
                     result += ")"
         else:
             raise ValueError(
-                f"The number of arguments passed {self.getLen()} is different from the number expected {parametrs_count}"
+                f"The number of arguments passed {len(self)} is different from the number expected {parametrs_count}"
             )
         return result
 

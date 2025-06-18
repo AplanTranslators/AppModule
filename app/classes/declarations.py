@@ -95,12 +95,12 @@ class DeclTypeArray:
     def addElement(self, new_element: DeclType):
         self.elements.append(new_element)
 
-    def getLen(self):
+    def __len__(self) -> int:
         return len(self.elements)
 
     def getLastElement(self) -> DeclType | None:
-        if self.getLen() > 0:
-            return self.elements[self.getLen() - 1]
+        if len(self) > 0:
+            return self.elements[len(self) - 1]
         else:
             return None
 
@@ -354,7 +354,7 @@ class DeclarationArray(BasicArray):
         self,
         identifier: str,
     ):
-        element = self.findElement(identifier)
+        element = self.getElement(identifier)
         if element is not None:
             if element.dimension_size > 0:
                 return element
