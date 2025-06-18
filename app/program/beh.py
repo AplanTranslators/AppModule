@@ -13,12 +13,13 @@ def create_Beh_File(self: "Program"):
     for index, module in enumerate(
         self.modules.getElementsIE(exclude=ElementsTypes.OBJECT_ELEMENT).getElements()
     ):
-        tmp = [
+
+        raw_protocol_strings = [
             module.getBehInitProtocols(),
             module.structures.getStructuresInStrFormat(),
             module.out_of_block_elements.getProtocolsInStrFormat(),
         ]
-
+        tmp = [s for s in raw_protocol_strings if s and s.strip()]
         tmp = "\n".join(tmp)
 
         tmp = self.str_formater.removeTrailingComma(tmp)

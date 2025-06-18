@@ -54,7 +54,7 @@ class Module(Basic):
             self.identifier
         )  # Already upper from super().__init__
         self.ident_uniq_name_upper: str = self.ident_uniq_name.upper()
-        
+
         self.number: int = name_space_level
 
         # Initialize collections for various sub-elements within the module.
