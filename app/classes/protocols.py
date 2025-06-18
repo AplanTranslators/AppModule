@@ -1,5 +1,5 @@
 import re
-from typing import Optional, Tuple, List, Union
+from typing import Any, Optional, Tuple, List, Union
 from ..classes.parametrs import ParametrArray
 from ..classes.basic import Basic, BasicArray
 
@@ -389,120 +389,357 @@ class BodyElementArray(BasicArray):
 
 
 class Protocol(Basic):
+    """
+    Represents a 'protocol' block, which is a named entity containing a sequence
+    of operations or statements (its 'body') and a set of associated parameters.
+    This often corresponds to a high-level function, task, or a state machine
+    description in hardware design.
+
+    It extends the `Basic` class to inherit fundamental properties like `identifier`
+    and `source_interval`.
+    """
+
     def __init__(
         self,
         identifier: str,
         source_interval: Tuple[int, int],
         element_type: ElementsTypes = ElementsTypes.NONE_ELEMENT,
-        parametrs: ParametrArray | None = None,
+        parametrs: Optional[
+            ParametrArray
+        ] = None,  # Made optional, will be initialized in the body
     ):
+        """
+        Initializes a new `Protocol` instance.
+
+        Args:
+            identifier (str): The name of the protocol (e.g., "read_data", "write_reg").
+            source_interval (Tuple[int, int]): A tuple (start_position, end_position)
+                                                indicating where this protocol appears
+                                                in the original source file.
+            element_type (ElementsTypes, optional): The classification of this protocol's type.
+                                                    Defaults to `ElementsTypes.NONE_ELEMENT`.
+            parametrs (Optional[ParametrArray], optional): A collection of `Parametr` objects
+                                                          representing the inputs/outputs or
+                                                          configuration parameters of this protocol.
+                                                          If `None`, an empty `ParametrArray` is created.
+        """
         super().__init__(identifier, source_interval, element_type)
+
+        # `body` stores the sequence of operations/statements within this protocol.
         self.body: BodyElementArray = BodyElementArray()
-        self.parametrs: ParametrArray = ParametrArray()
-        if parametrs is not None:
-            self.parametrs = parametrs
 
-    def copy(self):
-        protocol = Protocol(self.identifier, self.source_interval, self.element_type)
-        for element in self.body.getElements():
-            protocol.body.addElement(element)
-        protocol.parametrs = self.parametrs.copy()
-        protocol.number = self.number
-        return protocol
-
-    def addBody(self, body: BodyElement):
-        self.body.addElement(body)
-
-    def getName(self):
-        identifier = self.identifier
-        if self.number:
-            identifier = "{0}_{1}".format(identifier, self.number)
-        if len(self.parametrs) > 0:
-            identifier = "{0}({1})".format(identifier, str(self.parametrs))
-
-        return identifier
-
-    def updateLinks(self, module):
-        for index, element in enumerate(self.body.getElements()):
-            func_name = self.utils.extractFunctionName(element.identifier)
-            if func_name:
-                action = module.actions.getElement(func_name)
-                if action:
-                    self.body[index] = (
-                        action,
-                        element.element_type,
-                        element.element_type,
-                    )
-
-    def __str__(self):
-        return "{0} = {1}".format(
-            self.getName(),
-            str(self.body),
+        # `parametrs` stores the formal parameters of this protocol.
+        # Ensure a new instance if None is passed to avoid mutable default argument issues.
+        self.parametrs: ParametrArray = (
+            parametrs if parametrs is not None else ParametrArray()
         )
 
-    def __repr__(self):
-        return f"\tProtocol({self.identifier!r}, {self.sequence!r})\n"
+        # `number` attribute is used in `getName`, assuming it's set elsewhere.
+        # It's good practice to initialize it here if it's a common attribute.
+        self.number: Optional[int] = (
+            None  # Placeholder, assume it's assigned later if needed
+        )
+
+    def copy(self) -> "Protocol":
+        """
+        Creates a deep copy of the current `Protocol` instance.
+        It ensures that mutable nested objects (`body` and `parametrs`) are
+        also deep-copied to prevent unintended shared state.
+
+        Returns:
+            Protocol: A new `Protocol` object with copied attributes and nested structures.
+        """
+        # Create a new Protocol instance with basic attributes
+        new_protocol = Protocol(
+            self.identifier, self.source_interval, self.element_type
+        )
+
+        # Deep copy the BodyElementArray (body of the protocol)
+        new_protocol.body = self.body.copy()
+
+        # Deep copy the ParametrArray (parameters of the protocol)
+        new_protocol.parametrs = self.parametrs.copy()
+
+        # Copy the 'number' attribute if it exists
+        new_protocol.number = self.number
+
+        # If there are other attributes that are mutable objects, they should also be deep-copied.
+        # Example: new_protocol.some_list = list(self.some_list)
+
+        return new_protocol
+
+    def addBodyElement(self, body_element: BodyElement) -> None:
+        """
+        Adds a `BodyElement` to the protocol's body.
+
+        Args:
+            body_element (BodyElement): The `BodyElement` to be added to this protocol's sequence of operations.
+        """
+        self.body.addElement(body_element)
+
+    def getName(self) -> str:
+        """
+        Generates a formatted name for the protocol.
+        It can include a numeric suffix (if `self.number` is set) and
+        a parenthesized list of parameters (if the protocol has any).
+
+        Returns:
+            str: The formatted name string for the protocol.
+                 Examples: "my_protocol", "my_protocol_1", "my_protocol(arg1, arg2)".
+        """
+        display_identifier = self.identifier
+
+        # Append numeric suffix if 'number' is set
+        if (
+            self.number is not None
+        ):  # Use `is not None` for clarity when dealing with optional numbers like 0
+            display_identifier = f"{display_identifier}_{self.number}"
+
+        # Append parameters in parentheses if they exist
+        if len(self.parametrs) > 0:
+            display_identifier = f"{display_identifier}({str(self.parametrs)})"
+
+        return display_identifier
+
+    def updateLinks(self, module: Any) -> None:
+        """
+        Updates internal references (links) within the protocol's body.
+        This method iterates through the `BodyElement`s in the protocol's `body`.
+        If a `BodyElement`'s identifier corresponds to a known 'action' in the
+        provided `module`, it replaces the `BodyElement` with the actual 'action' object.
+
+        This mechanism is crucial for resolving symbolic references to actual objects.
+
+        Args:
+            module (Any): An object representing a module, expected to have an
+                          `actions` attribute (e.g., `module.actions`) which is
+                          a collection (like `BasicArray`) containing callable
+                          'action' elements. It also needs a `utils` object
+                          (e.g., `self.utils`) to extract function names.
+        """
+        # Ensure `self.utils` is available. This should ideally be initialized in __init__
+        # or passed to the Protocol class, or inherited from Basic.
+        if not hasattr(self, "utils") or self.utils is None:
+            # Consider logging an error or raising an exception if utils is mandatory for this method
+            self.logger.warning(
+                f" 'utils' not initialized for Protocol '{self.identifier}'. Cannot update links."
+            )
+            return
+
+        for index, element in enumerate(
+            self.body.getElements()
+        ):  # Assuming getElements() is available for BodyElementArray
+            # Attempt to extract a function name from the body element's identifier
+            func_name = self.utils.extractFunctionName(element.identifier)
+
+            if func_name:  # If a function name was successfully extracted
+                # Try to find the corresponding action in the module's actions collection
+                action = module.actions.getElement(
+                    func_name
+                )  # Assumes module.actions has getElement method
+
+                if action:
+                    # If the action is found, replace the BodyElement at this index
+                    # with a tuple containing the action and its types.
+                    # The original code's replacement `(action, element.element_type, element.element_type)`
+                    # seems to convert a BodyElement into a tuple. This might imply a
+                    # different internal representation for linked elements.
+                    # This change in type (from BodyElement to Tuple) could cause issues if
+                    # subsequent operations expect a BodyElement.
+                    # CONSIDER: Is it better to update `element.pointer_to_related = action`
+                    # or to ensure `BodyElementArray` can store heterogeneous types or a custom wrapper?
+                    # For now, matching original behavior, but flagging as a potential design area.
+                    self.body.elements[index] = (
+                        action,  # The resolved action object
+                        element.element_type,  # Original element type of the BodyElement
+                        element.element_type,  # Duplicated element type; confirm if intentional or an error
+                    )
+
+    def __str__(self) -> str:
+        """
+        Returns a human-readable string representation of the protocol,
+        showing its name and its body (sequence of operations).
+        Formats as "ProtocolName = ProtocolBody".
+
+        Returns:
+            str: The string representation of the protocol.
+        """
+
+        return f"{self.getName()} = {str(self.body)}"
+
+    def __repr__(self) -> str:
+        """
+        Returns a developer-friendly string representation of the `Protocol` object,
+        displaying its key attributes for debugging and introspection.
+        """
+        return (
+            f"Protocol("
+            f"identifier={self.identifier!r}, "
+            f"source_interval={self.source_interval!r}, "
+            f"element_type={self.element_type!r}, "
+            f"parametrs={self.parametrs!r}, "
+            f"body={self.body!r}, "
+            f"number={self.number!r}"
+            f")"
+        )
 
 
 class ProtocolArray(BasicArray):
-    def __init__(self):
-        super().__init__(Protocol)
+    """
+    A specialized array for managing a collection of `Protocol` objects.
+    This class extends `BasicArray` and provides methods for filtering,
+    updating links across multiple protocols, and generating a string
+    representation of all contained protocols.
+    """
 
-    def copy(self):
-        new_aray: ProtocolArray = ProtocolArray()
-        for element in self.getElements():
-            new_aray.addElement(element.copy())
-        return new_aray
+    def __init__(self):
+        """
+        Initializes a new `ProtocolArray` instance, specifically configured
+        to store objects of type `Protocol`.
+        """
+        super().__init__(Protocol)  # Configure BasicArray to hold Protocol objects
+
+    def copy(self) -> "ProtocolArray":
+        """
+        Creates a deep copy of the current `ProtocolArray` instance.
+        It iterates through all contained `Protocol` objects and adds their deep copies
+        to the new array, ensuring full independence.
+
+        Returns:
+            ProtocolArray: A new `ProtocolArray` containing deep copies of all original protocols.
+        """
+        new_array = ProtocolArray()
+        for protocol_element in self.elements:  # Access self.elements directly
+            new_array.addElement(
+                protocol_element.copy()
+            )  # Use Protocol's deep copy method
+        return new_array
 
     def getElementsIE(
         self,
-        include: ElementsTypes | None = None,
-        exclude: ElementsTypes | None = None,
-        include_identifier: str | None = None,
-        exclude_identifier: str | None = None,
-    ):
-        result: ProtocolArray = ProtocolArray()
-        elements = self.elements
+        include_type: Optional[ElementsTypes] = None,
+        exclude_type: Optional[ElementsTypes] = None,
+        include_identifier: Optional[str] = None,
+        exclude_identifier: Optional[str] = None,
+    ) -> "ProtocolArray":
+        """
+        Filters the protocols in the array based on their `element_type`
+        and/or `identifier`. This method allows for both inclusion and exclusion criteria.
 
+        Args:
+            include_type (Optional[ElementsTypes]): Only include protocols with this element type.
+            exclude_type (Optional[ElementsTypes]): Exclude protocols with this element type.
+            include_identifier (Optional[str]): Only include protocols with this identifier.
+            exclude_identifier (Optional[str]): Exclude protocols with this identifier.
+
+        Returns:
+            ProtocolArray: A new `ProtocolArray` containing only the protocols that
+                           match the specified filtering criteria. If no criteria are
+                           provided, a copy of the original array is returned.
+        """
+        result_array: ProtocolArray = ProtocolArray()
+
+        # If no filters are specified, return a deep copy of the entire array.
         if (
-            include is None
-            and exclude is None
+            include_type is None
+            and exclude_type is None
             and include_identifier is None
             and exclude_identifier is None
         ):
             return self.copy()
 
-        for element in elements:
-            if include is not None and element.element_type is not include:
-                continue
-            if exclude is not None and element.element_type is exclude:
-                continue
+        for element in self.elements:  # Iterate directly over the internal list
+            # Apply inclusion/exclusion filters for element_type
+            if include_type is not None and element.element_type is not include_type:
+                continue  # Skip if type doesn't match inclusion
+            if exclude_type is not None and element.element_type is exclude_type:
+                continue  # Skip if type matches exclusion
+
+            # Apply inclusion/exclusion filters for identifier
+            # Note: `is not` and `is` for string comparison is generally not recommended
+            # for content equality; use `!=` and `==`. 'is' checks for object identity.
+            # Assuming 'is' was intended for literal string comparisons, but changed to '==' for safety.
             if (
                 include_identifier is not None
-                and element.identifier is not include_identifier
+                and element.identifier != include_identifier
             ):
-                continue
+                continue  # Skip if identifier doesn't match inclusion
             if (
                 exclude_identifier is not None
-                and element.identifier is exclude_identifier
+                and element.identifier == exclude_identifier
             ):
-                continue
+                continue  # Skip if identifier matches exclusion
 
-            result.addElement(element)
+            result_array.addElement(element)  # Add the element if it passes all filters
 
-        return result
+        return result_array
 
-    def updateLinks(self, module):
-        for element in self.getElements():
+    def updateLinks(self, module: Any) -> None:
+        """
+        Calls the `updateLinks` method for each `Protocol` object within this array.
+        This cascades the link-updating process down to the individual protocols
+        and their bodies.
+
+        Args:
+            module (Any): An object representing a module, passed down to each protocol's
+                          `updateLinks` method.
+        """
+        for element in self.elements:  # Iterate directly over the internal list
             element.updateLinks(module)
 
-    def getProtocolsInStrFormat(self):
-        result = ""
+    def getProtocolsInStrFormat(self) -> str:
+        """
+        Generates a combined string representation of all protocols in the array.
+        Each protocol's string representation is placed on a new line.
+        It also attempts to remove a trailing comma if present, which indicates
+        a dependency on `string_formater`.
+
+        Returns:
+            str: A multi-line string with all protocols formatted.
+        """
+        result_parts: List[str] = []
         for element in self.elements:
-            result += "\n"
-            result += str(element)
-        result = self.string_formater.removeTrailingComma(result)
+            result_parts.append(
+                str(element)
+            )  # Get string representation of each protocol
+
+        result = "\n".join(result_parts)  # Join with newlines
+
+        # Assuming self.string_formater is initialized
+        if hasattr(self, "string_formater") and self.string_formater is not None:
+            result = self.string_formater.removeTrailingComma(result)
+        else:
+            self.logger.warning(
+                "string_formater not initialized for ProtocolArray. Cannot remove trailing comma."
+            )
+
         return result
 
-    def __repr__(self):
+    def __str__(self) -> str:
+        """
+        Returns a human-readable string representation of the `ProtocolArray`,
+        similar to `getProtocolsInStrFormat`, but without the trailing comma removal.
+        Each protocol is on a new line.
+        """
+
+        return "\n".join(str(element) for element in self.elements)
+
+    def __repr__(self) -> str:
+        """
+        Returns a developer-friendly string representation of the `ProtocolArray` object,
+        displaying the `repr` of its internal elements.
+        """
         return f"ProtocolsArray(\n{self.elements!r}\n)"
+
+    # Add standard container methods for better usability
+    def __len__(self) -> int:
+        """Returns the number of elements in the array. Enables `len(instance)`."""
+        return len(self.elements)
+
+    def __getitem__(self, index: Union[int, slice]) -> Union[Protocol, List[Protocol]]:
+        """Allows direct indexing and slicing of the array, e.g., `array[0]` or `array[1:3]`."""
+        return self.elements[index]
+
+    def __iter__(self):
+        """Makes the array iterable, allowing `for element in array_instance:`."""
+        return iter(self.elements)

@@ -570,7 +570,7 @@ class Declaration(Basic):
             f"element_type={self.element_type!r}, "
             f"action={self.action!r}, "
             f"struct_name={self.struct_name!r}, "
-            f"name_space_level={self.number!r}, "  # Use self.number which stores namespace_level
+            f"name_space_level={self.number!r}, "  # Use self.number which stores name_space_level
             f"file_path={self.file_path!r}, "
             f"sequence={getattr(self, 'sequence', 'N/A')!r})"
         )
