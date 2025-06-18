@@ -206,7 +206,7 @@ class Action(Basic):
         description = "; ".join(description_parts)
 
         # Append the action name part
-        #if description:  # Add "; " only if description_start had elements
+        # if description:  # Add "; " only if description_start had elements
         #    description += "; "
         description += f":action '{self.description_action_name} ("
 
