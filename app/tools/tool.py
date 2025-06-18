@@ -34,7 +34,7 @@ class BaseTool:
             color="cyan",
         )
         start_time = time.time()
-        tmp = "Program start time: " + self.time_utils.format_time_date_h_m_s(
+        tmp = "Program start time: " + self.time_utils.format_time_h_m_s(
             start_time
         )
         self.logger.info(tmp, "green")
@@ -125,7 +125,7 @@ class BaseTool:
 
         start_time = time.time()
         self.logger.info(
-            "Testing start time: " + self.time_utils.format_time_m_s(start_time),
+            "Testing start time: " + self.time_utils.format_time_h_m_s(start_time),
             color="green",
         )
 
@@ -199,7 +199,7 @@ class BaseTool:
         start_time = time.time()
         self.logger.info(
             "Generation process start time: "
-            + self.time_utils.format_time_m_s(start_time),
+            + self.time_utils.format_time_h_m_s(start_time),
             color="green",
         )
 
