@@ -8,7 +8,7 @@ from ..program.evt import create_EVT_File
 from ..utils.singleton import SingletonMeta
 from ..classes.typedef import TypedefArray
 from ..classes.design_unit import DesignUnitArray
-from ..classes.module_call import ModuleCallArray
+from ..classes.design_unit_call import ModuleCallArray
 import os
 
 

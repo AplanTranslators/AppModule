@@ -1,11 +1,11 @@
 from typing import List, Optional, Tuple
-from ..classes.basic import Basic, BasicArray
-from ..classes.element_types import ElementsTypes
-from ..classes.value_parametrs import ValueParametrArray
+from .basic import Basic, BasicArray
+from .element_types import ElementsTypes
+from .value_parametrs import ValueParametrArray
 import re
 
 
-class ModuleCall(Basic):
+class DesignUnitCall(Basic):
     """
     Represents an instance of a design_unit call (instantiation) in a hardware description
     language (HDL) context (e.g., SystemVerilog design_unit instantiation).
@@ -48,7 +48,7 @@ class ModuleCall(Basic):
         source_parametrs: Optional[ValueParametrArray] = None,
     ):
         """
-        Initializes a new `ModuleCall` instance.
+        Initializes a new `DesignUnitCall` instance.
 
         Args:
             identifier (str): The unique identifier for this design_unit *instance* (e.g., "U1" or "my_instance").
@@ -67,7 +67,7 @@ class ModuleCall(Basic):
                                                               Defaults to None.
         """
         # Call the parent `Basic` constructor.
-        # The source_interval (0,0) suggests that ModuleCall instances might not always
+        # The source_interval (0,0) suggests that DesignUnitCall instances might not always
         # have a direct textual span, or it's implicitly handled elsewhere.
         super().__init__(
             identifier, (0, 0), element_type=ElementsTypes.MODULE_CALL_ELEMENT
@@ -97,11 +97,11 @@ class ModuleCall(Basic):
 
     def __repr__(self) -> str:
         """
-        Returns a developer-friendly string representation of the `ModuleCall` object.
+        Returns a developer-friendly string representation of the `DesignUnitCall` object.
         This provides a detailed view of its state for debugging and inspection.
         """
         return (
-            f"ModuleCall(\n"
+            f"DesignUnitCall(\n"
             f"\tidentifier={self.identifier!r},\n"
             f"\tobject_name={self.object_name!r},\n"
             f"\tsource_identifier={self.source_identifier!r},\n"
@@ -113,7 +113,7 @@ class ModuleCall(Basic):
 
     def __str__(self) -> str:
         """
-        Returns a human-readable string representation of the `ModuleCall` object.
+        Returns a human-readable string representation of the `DesignUnitCall` object.
         This provides a concise summary of the design_unit instantiation.
         """
         params_str = ""
@@ -132,7 +132,7 @@ class ModuleCall(Basic):
 
 class ModuleCallArray(BasicArray):
     """
-    A specialized array for managing a collection of `ModuleCall` objects.
+    A specialized array for managing a collection of `DesignUnitCall` objects.
     This class extends `BasicArray` and provides specific methods for
     finding and filtering design_unit calls within a design.
     """
@@ -140,13 +140,13 @@ class ModuleCallArray(BasicArray):
     def __init__(self):
         """
         Initializes a new `ModuleCallArray` instance, specifically configured
-        to store objects of type `ModuleCall`.
+        to store objects of type `DesignUnitCall`.
         """
-        super().__init__(ModuleCall)
+        super().__init__(DesignUnitCall)
 
-    def findModuleByUniqIdentifier(self, object_name: str) -> Optional[ModuleCall]:
+    def findModuleByUniqIdentifier(self, object_name: str) -> Optional[DesignUnitCall]:
         """
-        Finds a `ModuleCall` object based on the unique name of the design_unit *definition*
+        Finds a `DesignUnitCall` object based on the unique name of the design_unit *definition*
         being instantiated (`object_name`).
 
         Args:
@@ -154,7 +154,7 @@ class ModuleCallArray(BasicArray):
                                to search for among the instantiated modules.
 
         Returns:
-            Optional[ModuleCall]: The first `ModuleCall` object found that instantiates
+            Optional[DesignUnitCall]: The first `DesignUnitCall` object found that instantiates
                                    a design_unit with the given `object_name`, or `None` if not found.
         """
         for element in self.elements:
@@ -170,7 +170,7 @@ class ModuleCallArray(BasicArray):
         exclude_identifier: Optional[str] = None,
     ) -> "ModuleCallArray":
         """
-        Filters and retrieves `ModuleCall` elements based on specified inclusion/exclusion criteria.
+        Filters and retrieves `DesignUnitCall` elements based on specified inclusion/exclusion criteria.
         This method primarily supports filtering by `ElementsTypes` and instance identifiers.
 
         Args:
@@ -241,7 +241,7 @@ class ModuleCallArray(BasicArray):
         """
         return iter(self.elements)
 
-    def __getitem__(self, index: int) -> ModuleCall:
+    def __getitem__(self, index: int) -> DesignUnitCall:
         """
         Enables direct access to elements using square brackets (e.g., `my_array[0]`).
 
@@ -249,6 +249,6 @@ class ModuleCallArray(BasicArray):
             index (int): The index of the element to retrieve.
 
         Returns:
-            ModuleCall: The `ModuleCall` object at the specified index.
+            DesignUnitCall: The `DesignUnitCall` object at the specified index.
         """
         return self.elements[index]
