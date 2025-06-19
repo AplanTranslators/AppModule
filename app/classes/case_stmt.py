@@ -1,7 +1,7 @@
 from typing import Optional, Tuple
 from ..classes.element_types import ElementsTypes
 from ..classes.structure import Structure
-from antlr4_verilog.systemverilog import SystemVerilogParser
+#from antlr4_verilog.systemverilog import SystemVerilogParser
 
 
 class CaseStmt(Structure):
@@ -41,7 +41,7 @@ class CaseStmt(Structure):
         # The expression that the case statement evaluates.
         # This is typed as a specific ANTLR4 parser context, allowing direct access
         # to the parsed syntax tree node for the expression.
-        self.expression: Optional[SystemVerilogParser.Case_expressionContext] = None
+        self.expression = None
         # 'init_case_count' stores the initial or total number of case items.
         self.init_case_count: int = 0
         # 'case_count' can be used as a mutable counter, perhaps for tracking
