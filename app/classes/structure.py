@@ -167,7 +167,7 @@ class Structure(Basic):
                 display_identifier = f"{display_identifier}({str(self.parametrs)})"
         return display_identifier
 
-    def get_last_behavior(self) -> Optional[Union["Protocol", "Structure"]]:
+    def getLastBehaviorIndex(self) -> Optional[Union["Protocol", "Structure"]]:
         """
         Retrieves the last `Protocol` or `Structure` object added to this
         Structure's `behavior` list.
@@ -175,9 +175,10 @@ class Structure(Basic):
         Returns:
             Optional[Union[Protocol, Structure]]: The last behavior element, or None if the list is empty.
         """
-        if not self.behavior:
+        beh_len = len(self.behavior)
+        if beh_len <= 0:
             return None
-        return self.behavior[-1]
+        return beh_len - 1
 
     def insertBehavior(
         self, index: int, element: Union["Protocol", "Structure"]
