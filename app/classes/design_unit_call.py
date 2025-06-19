@@ -130,7 +130,7 @@ class DesignUnitCall(Basic):
         )
 
 
-class ModuleCallArray(BasicArray):
+class DesignUnitCallArray(BasicArray):
     """
     A specialized array for managing a collection of `DesignUnitCall` objects.
     This class extends `BasicArray` and provides specific methods for
@@ -139,7 +139,7 @@ class ModuleCallArray(BasicArray):
 
     def __init__(self):
         """
-        Initializes a new `ModuleCallArray` instance, specifically configured
+        Initializes a new `DesignUnitCallArray` instance, specifically configured
         to store objects of type `DesignUnitCall`.
         """
         super().__init__(DesignUnitCall)
@@ -151,7 +151,7 @@ class ModuleCallArray(BasicArray):
 
         Args:
             object_name (str): The name of the design_unit definition (e.g., "my_adder")
-                               to search for among the instantiated modules.
+                               to search for among the instantiated design_units.
 
         Returns:
             Optional[DesignUnitCall]: The first `DesignUnitCall` object found that instantiates
@@ -168,7 +168,7 @@ class ModuleCallArray(BasicArray):
         exclude: Optional[ElementsTypes] = None,
         include_identifier: Optional[str] = None,
         exclude_identifier: Optional[str] = None,
-    ) -> "ModuleCallArray":
+    ) -> "DesignUnitCallArray":
         """
         Filters and retrieves `DesignUnitCall` elements based on specified inclusion/exclusion criteria.
         This method primarily supports filtering by `ElementsTypes` and instance identifiers.
@@ -184,10 +184,10 @@ class ModuleCallArray(BasicArray):
                                                 matching this instance identifier.
 
         Returns:
-            ModuleCallArray: A new `ModuleCallArray` containing only the filtered elements.
+            DesignUnitCallArray: A new `DesignUnitCallArray` containing only the filtered elements.
                               Returns a deep copy of the original array if no filters are applied.
         """
-        result_array: ModuleCallArray = ModuleCallArray()
+        result_array: DesignUnitCallArray = DesignUnitCallArray()
 
         # If no filters are specified, return a deep copy of all elements for consistency.
         if all(
@@ -222,22 +222,22 @@ class ModuleCallArray(BasicArray):
 
     def __repr__(self) -> str:
         """
-        Returns a developer-friendly string representation of the `ModuleCallArray` object.
+        Returns a developer-friendly string representation of the `DesignUnitCallArray` object.
         This is useful for debugging and provides a clear view of the array's contents.
         """
-        return f"ModuleCallArray(\n{self.elements!r}\n)"
+        return f"DesignUnitCallArray(\n{self.elements!r}\n)"
 
     def __str__(self) -> str:
         """
-        Returns a human-readable string representation of the `ModuleCallArray`.
+        Returns a human-readable string representation of the `DesignUnitCallArray`.
         Each design_unit call is represented on a new line.
         """
         return "\n".join(str(call) for call in self.elements)
 
     def __iter__(self):
         """
-        Makes the `ModuleCallArray` iterable, allowing direct iteration over its elements
-        (e.g., `for call in my_module_calls:`).
+        Makes the `DesignUnitCallArray` iterable, allowing direct iteration over its elements
+        (e.g., `for call in my_design_units_calls:`).
         """
         return iter(self.elements)
 

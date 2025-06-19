@@ -17,7 +17,7 @@ class DesignUnit(Basic):
     """
     Represents a hardware design_unit, a software class, or a similar encapsulated entity
     within a design. It aggregates various types of elements, including declarations,
-    typedefs, actions, structures, parameters, and nested modules/objects,
+    typedefs, actions, structures, parameters, and nested design_units/objects,
     providing a holistic view of a design component.
     """
 
@@ -72,7 +72,7 @@ class DesignUnit(Basic):
         self.tasks: "TaskArray" = TaskArray()
         self.packages_and_objects: "DesignUnitArray" = (
             DesignUnitArray()
-        )  # For nested modules or class instances
+        )  # For nested design_units or class instances
 
     # Type hint for copy return type: Self for Python 3.11+, else forward reference str
     def copyPart(self) -> "DesignUnit":
@@ -167,9 +167,9 @@ class DesignUnit(Basic):
         """
         Transforms identifiers in a given input string to an "agent attribute call" format.
         This means prefixing identifiers with either "object_pointer." (for classes)
-        or the design_unit's unique name (for regular modules).
+        or the design_unit's unique name (for regular design_units).
         It processes both the current design_unit's declarations and, optionally,
-        declarations from a list of external packages/modules.
+        declarations from a list of external packages/design_units.
 
         Args:
             input_string (str): The string in which identifiers need to be transformed.
@@ -185,7 +185,7 @@ class DesignUnit(Basic):
             # For class elements, typically use a generic "object_pointer"
             ident_prefix = "object_pointer"
         else:
-            # For regular modules, use the design_unit's unique name
+            # For regular design_units, use the design_unit's unique name
             ident_prefix = self.ident_uniq_name
 
         # Process declarations within the current design_unit
@@ -199,7 +199,7 @@ class DesignUnit(Basic):
                 input_string,
             )
 
-        # Optionally process declarations from external packages/modules
+        # Optionally process declarations from external packages/design_units
         if packages is not None:
             for package in packages:
                 # Determine the prefix for elements from the current package
@@ -643,7 +643,7 @@ class DesignUnitArray(BasicArray):
 
         Returns:
             DesignUnitArray: A new `DesignUnitArray` containing deep copies of all
-                         original modules.
+                         original design_units.
         """
         new_array = DesignUnitArray()
         for element in self.elements:  # Iterate directly over the internal list
@@ -703,14 +703,14 @@ class DesignUnitArray(BasicArray):
         including `element_type` and unique identifiers.
 
         Args:
-            include (Optional[ElementsTypes]): Only include modules with this element type.
-            exclude (Optional[ElementsTypes]): Exclude modules with this element type.
-            include_ident_uniq_names (Optional[List[str]]): Only include modules whose unique
+            include (Optional[ElementsTypes]): Only include design_units with this element type.
+            exclude (Optional[ElementsTypes]): Exclude design_units with this element type.
+            include_ident_uniq_names (Optional[List[str]]): Only include design_units whose unique
                                                             identifier is in this list.
-            exclude_ident_uniq_name (Optional[str]): Exclude modules with this specific unique identifier.
+            exclude_ident_uniq_name (Optional[str]): Exclude design_units with this specific unique identifier.
 
         Returns:
-            DesignUnitArray: A new `DesignUnitArray` containing only the modules that
+            DesignUnitArray: A new `DesignUnitArray` containing only the design_units that
                          match all specified filtering criteria. If no criteria are
                          provided, a deep copy of the original array is returned.
         """

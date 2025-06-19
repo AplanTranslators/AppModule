@@ -11,7 +11,7 @@ def create_Beh_File(self: "Program"):
     # ----------------------------------
     behaviour = []
     for index, design_unit in enumerate(
-        self.modules.getElementsIE(exclude=ElementsTypes.OBJECT_ELEMENT).getElements()
+        self.design_units.getElementsIE(exclude=ElementsTypes.OBJECT_ELEMENT).getElements()
     ):
 
         raw_protocol_strings = [

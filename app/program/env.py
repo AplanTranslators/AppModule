@@ -18,7 +18,7 @@ def create_ENV_File(self: "Program"):
     sub_env = ""
     decls = self.typedefs.getElementsIE()
 
-    for design_unit in self.modules.getElements():
+    for design_unit in self.design_units.getElements():
         decls += design_unit.typedefs.getElementsIE()
 
     sub_env += str(decls)
@@ -40,7 +40,7 @@ def create_ENV_File(self: "Program"):
 
     env += "\tagent_types : obj (\n"
 
-    for design_unit in self.modules.getElementsIE(
+    for design_unit in self.design_units.getElementsIE(
         exclude=ElementsTypes.OBJECT_ELEMENT
     ).getElements():
         env += "\t\t{0} : obj (\n".format(design_unit.identifier)
@@ -64,7 +64,7 @@ def create_ENV_File(self: "Program"):
     # Agents
     # ----------------------------------
     env += "\tagents : obj (\n"
-    for design_unit in self.modules.getElementsIE(
+    for design_unit in self.design_units.getElementsIE(
         exclude=ElementsTypes.CLASS_ELEMENT
     ).getElements():
         env += "\t\t{0} : obj ({1}),\n".format(

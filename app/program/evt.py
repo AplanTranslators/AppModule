@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
 def create_EVT_File(self: "Program"):
     evt = "events(\n"
-    for design_unit in self.modules.getElements():
+    for design_unit in self.design_units.getElements():
         for elem in design_unit.declarations.getInputPorts():
             evt += "\ts_{0}:obj(x1:{1});\n".format(
                 elem.getName(), elem.getAplanDecltype()

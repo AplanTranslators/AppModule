@@ -55,7 +55,7 @@ class Node(Basic):
         self.expression: Optional[str] = (
             None  # The full string expression this node is part of, or represents.
         )
-        self.module_name: Optional[str] = (
+        self.design_unit_name: Optional[str] = (
             None  # If this node represents a signal within a design_unit instance,
         )
         # this holds the instance name (e.g., `U1.signal_name`).
@@ -77,7 +77,7 @@ class Node(Basic):
         """
         node_copy = Node(self.identifier, self.source_interval, self.element_type)
         node_copy.expression = self.expression
-        node_copy.module_name = self.module_name
+        node_copy.design_unit_name = self.design_unit_name
         node_copy.bit_selection = self.bit_selection
         node_copy.range_selection = self.range_selection
         return node_copy
@@ -97,8 +97,8 @@ class Node(Basic):
         result = self.identifier
 
         # Prepend design_unit name if present (e.g., "design_unit.signal")
-        if self.module_name:
-            result = f"{self.module_name}.{result}"
+        if self.design_unit_name:
+            result = f"{self.design_unit_name}.{result}"
 
         # Apply formatting based on range selection type
         if self.range_selection == RangeTypes.START_END:
@@ -138,7 +138,7 @@ class Node(Basic):
             f"source_interval={self.source_interval!r}, "
             f"element_type={self.element_type!r}, "
             f"expression={self.expression!r}, "
-            f"module_name={self.module_name!r}, "
+            f"design_unit_name={self.design_unit_name!r}, "
             f"bit_selection={self.bit_selection!r}, "
             f"range_selection={self.range_selection!r}, "
             f"sequence={getattr(self, 'sequence', 'N/A')!r})"

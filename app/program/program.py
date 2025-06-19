@@ -8,7 +8,7 @@ from ..program.evt import create_EVT_File
 from ..utils.singleton import SingletonMeta
 from ..classes.typedef import TypedefArray
 from ..classes.design_unit import DesignUnitArray
-from ..classes.design_unit_call import ModuleCallArray
+from ..classes.design_unit_call import DesignUnitCallArray
 import os
 
 
@@ -19,13 +19,13 @@ class Program(metaclass=SingletonMeta):
 
     def __init__(self, path_to_result: str = None) -> None:
         self.path_to_result = path_to_result
-        self.modules: DesignUnitArray = DesignUnitArray()
-        self._module_calls: ModuleCallArray = ModuleCallArray()
+        self.design_units: DesignUnitArray = DesignUnitArray()
+        self.DesignUnit: DesignUnitCallArray = DesignUnitCallArray()
         self._typedefs: TypedefArray = TypedefArray()
 
     @property
-    def module_calls(self) -> ModuleCallArray:
-        return self._module_calls
+    def design_units_calls(self) -> DesignUnitCallArray:
+        return self.DesignUnit
 
     @property
     def typedefs(self) -> TypedefArray:

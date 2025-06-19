@@ -38,7 +38,7 @@ class Parametr(Basic):
         # I'll adjust `unique_identifier` to correctly use `action_name` as a prefix.
 
         self.param_type: str = param_type  # Use param_type instead of type
-        self.module_name: Optional[str] = (
+        self.design_unit_name: Optional[str] = (
             None  # Name of the design_unit this parameter belongs to, if applicable.
         )
 
@@ -82,7 +82,7 @@ class Parametr(Basic):
         copied_param.unique_identifier = (
             self.unique_identifier
         )  # Directly copy already computed unique_identifier
-        copied_param.module_name = self.module_name  # Copy module_name
+        copied_param.design_unit_name = self.design_unit_name  # Copy design_unit_name
         copied_param.number = self.number  # Ensure 'number' is copied, if it exists
 
         return copied_param
@@ -112,7 +112,7 @@ class Parametr(Basic):
             f"param_type={self.param_type!r}, "
             f"unique_identifier={self.unique_identifier!r}, "
             f"source_interval={self.source_interval!r}, "
-            f"module_name={self.module_name!r}, "
+            f"design_unit_name={self.design_unit_name!r}, "
             f"number={self.number!r}"
             f")"
         )

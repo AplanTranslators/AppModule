@@ -57,7 +57,7 @@ class DeclTypes(Enum):
             type_str (str): The string representation of the type to check (e.g., "logic", "my_module").
             types (Iterable[Union[DesignUnit, DeclTypeInfo]]): An iterable collection of
                 known type definitions. This could include `DesignUnit` objects (for class-like
-                modules) or other custom type definition objects (e.g., an object
+                design_units) or other custom type definition objects (e.g., an object
                 that holds `identifier` and `data_type` attributes for enums/structs/unions).
 
         Returns:
@@ -102,7 +102,7 @@ class DeclTypes(Enum):
                 if type_str == known_type_definition.ident_uniq_name:
                     return (
                         DeclTypes.CLASS
-                    )  # Treating modules as 'classes' in this context
+                    )  # Treating design_units as 'classes' in this context
             else:
                 # For other custom types, assume they have 'identifier' and 'data_type' attributes
                 # Example: an object representing an enum, struct, or union definition.
