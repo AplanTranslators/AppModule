@@ -55,8 +55,8 @@ class DeclTypes(Enum):
 
         Args:
             type_str (str): The string representation of the type to check (e.g., "logic", "my_module").
-            types (Iterable[Union[Module, DeclTypeInfo]]): An iterable collection of
-                known type definitions. This could include `Module` objects (for class-like
+            types (Iterable[Union[DesignUnit, DeclTypeInfo]]): An iterable collection of
+                known type definitions. This could include `DesignUnit` objects (for class-like
                 modules) or other custom type definition objects (e.g., an object
                 that holds `identifier` and `data_type` attributes for enums/structs/unions).
 
@@ -65,8 +65,8 @@ class DeclTypes(Enum):
                        if no matching type is found.
         """
         # Defer import here to prevent potential circular dependency issues,
-        # especially if Module also needs to import DeclTypes.
-        from ..classes.module import Module
+        # especially if DesignUnit also needs to import DeclTypes.
+        from .design_unit import DesignUnit
 
         # Standard built-in types check
         if type_str == "int":
@@ -94,11 +94,11 @@ class DeclTypes(Enum):
         #     return DeclTypes.OUTPORT
 
         # Custom/user-defined types check
-        # This assumes that `types` contains objects that are either `Module` instances
+        # This assumes that `types` contains objects that are either `DesignUnit` instances
         # or objects with `identifier` and `data_type` attributes.
         for known_type_definition in types:
-            if isinstance(known_type_definition, Module):
-                # If it's a Module, compare with its unique identifier (e.g., module name)
+            if isinstance(known_type_definition, DesignUnit):
+                # If it's a DesignUnit, compare with its unique identifier (e.g., design_unit name)
                 if type_str == known_type_definition.ident_uniq_name:
                     return (
                         DeclTypes.CLASS

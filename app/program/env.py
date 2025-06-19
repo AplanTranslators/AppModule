@@ -18,8 +18,8 @@ def create_ENV_File(self: "Program"):
     sub_env = ""
     decls = self.typedefs.getElementsIE()
 
-    for module in self.modules.getElements():
-        decls += module.typedefs.getElementsIE()
+    for design_unit in self.modules.getElements():
+        decls += design_unit.typedefs.getElementsIE()
 
     sub_env += str(decls)
     if len(sub_env) > 0:
@@ -40,12 +40,12 @@ def create_ENV_File(self: "Program"):
 
     env += "\tagent_types : obj (\n"
 
-    for module in self.modules.getElementsIE(
+    for design_unit in self.modules.getElementsIE(
         exclude=ElementsTypes.OBJECT_ELEMENT
     ).getElements():
-        env += "\t\t{0} : obj (\n".format(module.identifier)
+        env += "\t\t{0} : obj (\n".format(design_unit.identifier)
         sub_env = ""
-        decls = module.declarations.getElementsIE(data_type_exclude=DeclTypes.ENUM_TYPE)
+        decls = design_unit.declarations.getElementsIE(data_type_exclude=DeclTypes.ENUM_TYPE)
         for index, elem in enumerate(decls.getElements()):
             if index > 0:
                 sub_env += ",\n"
@@ -64,11 +64,11 @@ def create_ENV_File(self: "Program"):
     # Agents
     # ----------------------------------
     env += "\tagents : obj (\n"
-    for module in self.modules.getElementsIE(
+    for design_unit in self.modules.getElementsIE(
         exclude=ElementsTypes.CLASS_ELEMENT
     ).getElements():
         env += "\t\t{0} : obj ({1}),\n".format(
-            module.identifier, module.ident_uniq_name
+            design_unit.identifier, design_unit.ident_uniq_name
         )
     env += "\t\tENVIRONMENT : obj (env)\n"
     env += "\t);\n"

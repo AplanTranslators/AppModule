@@ -168,7 +168,7 @@ class Logger(metaclass=SingletonMeta):
                     "ERROR": "red",
                     "CRITICAL": "red",
                 },
-                "module": {
+                "module_log_color": {
                     "DEBUG": "light_cyan",
                     "INFO": "light_cyan",
                     "WARNING": "light_cyan",

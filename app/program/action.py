@@ -10,10 +10,10 @@ def create_Action_File(self: "Program"):
     # Actions
     # ----------------------------------
     actions = ""
-    for index, module in enumerate(
+    for index, design_unit in enumerate(
         self.modules.getElementsIE(exclude=ElementsTypes.OBJECT_ELEMENT).getElements()
     ):
-        result = module.actions.getActionsInStrFormat()
+        result = design_unit.actions.getActionsInStrFormat()
         if index != 0:
             if len(result) > 0:
                 actions += ",\n"

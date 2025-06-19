@@ -25,7 +25,7 @@ class Typedef(Basic):
 
         Args:
             identifier (str): The common name of the new type (e.g., "my_state_t").
-            unique_identifier (str): A globally or module-unique identifier for this type
+            unique_identifier (str): A globally or design_unit-unique identifier for this type
                                      (e.g., "module_name_my_state_t").
             source_interval (Tuple[int, int]): The (start, end) character positions in the source file.
             file_path (str): The absolute or relative path to the file where this typedef is defined.

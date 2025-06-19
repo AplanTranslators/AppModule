@@ -11,7 +11,7 @@ class Structure(Basic):
     """
     Represents a structural block or scope within a larger design,
     such as a Verilog 'always' block, 'initial' block, 'task', 'function',
-    or a module-level construct. It can encapsulate a sequence of
+    or a design_unit-level construct. It can encapsulate a sequence of
     behaviors (Protocols or nested Structures) and manage its own parameters.
 
     It extends the `Basic` class for fundamental identification and source tracking.
@@ -123,20 +123,20 @@ class Structure(Basic):
             # print(f"Warning: Cannot add BodyElement to empty behavior list in Structure '{self.identifier}'")
             pass
 
-    def updateLinks(self, module: Any) -> None:
+    def updateLinks(self, design_unit: Any) -> None:
         """
         Cascades the link-updating process to all contained `Protocol` and
         `Structure` objects within this instance's `behavior` list.
         This is crucial for resolving symbolic references to actual objects
-        throughout the module's hierarchy.
+        throughout the design_unit's hierarchy.
 
         Args:
-            module (Any): An object representing the module, passed down to
+            design_unit (Any): An object representing the design_unit, passed down to
                           the nested elements' `updateLinks` methods.
         """
         for element in self.behavior:
             # Assumes all elements in `self.behavior` have an `updateLinks` method.
-            element.updateLinks(module)
+            element.updateLinks(design_unit)
 
     def getName(self, include_params: bool = True) -> str:
         """
@@ -466,18 +466,18 @@ class StructureArray(BasicArray):
 
         return result_array
 
-    def updateLinks(self, module: Any) -> None:
+    def updateLinks(self, design_unit: Any) -> None:
         """
         Calls the `updateLinks` method for each `Structure` object within this array.
         This cascades the link-updating process down to the individual structures
         and their contained elements.
 
         Args:
-            module (Any): An object representing a module, passed down to each
+            design_unit (Any): An object representing a design_unit, passed down to each
                           structure's `updateLinks` method.
         """
         for element in self.elements:  # Iterate directly over the internal list
-            element.updateLinks(module)
+            element.updateLinks(design_unit)
 
     def getAlwaysList(self):
         from ..classes.always import Always

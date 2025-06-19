@@ -296,9 +296,9 @@ class StringFormater(metaclass=SingletonMeta):
 
         return result
 
-    def notConcreteIndex2AplanStandart(self, expression: str, module):
-        """The function `notConcreteIndex2AplanStandart` takes an expression and a module, and replaces
-        specific index references with function calls based on the module's declarations.
+    def notConcreteIndex2AplanStandart(self, expression: str, design_unit):
+        """The function `notConcreteIndex2AplanStandart` takes an expression and a design_unit, and replaces
+        specific index references with function calls based on the design_unit's declarations.
 
         Parameters
         ----------
@@ -306,15 +306,15 @@ class StringFormater(metaclass=SingletonMeta):
             The `expression` parameter is a string that represents an expression containing array accesses in
         the format `identifier[index]`. The function `notConcreteIndex2AplanStandart` is designed to modify
         these array accesses based on certain conditions.
-        module
-            The `module` parameter in the `notConcreteIndex2AplanStandart` function is expected to be an object
-        that contains declarations with dimensions. The function uses this module to find a declaration with
+        design_unit
+            The `design_unit` parameter in the `notConcreteIndex2AplanStandart` function is expected to be an object
+        that contains declarations with dimensions. The function uses this design_unit to find a declaration with
         a dimension by name and then performs a specific replacement in the given expression based on the
         match found.
 
         Returns
         -------
-            The function `notConcreteIndex2AplanStandart` takes an expression and a module as input parameters.
+            The function `notConcreteIndex2AplanStandart` takes an expression and a design_unit as input parameters.
         It searches for a specific pattern in the expression, where a word followed by a dot and another
         word is followed by square brackets containing an index.
 
@@ -324,7 +324,7 @@ class StringFormater(metaclass=SingletonMeta):
         def replace_match(match):
             identifier, index = match.group(1), match.group(2)
             tmp = identifier.split(".")
-            decl_with_dimention = module.declarations.findDeclWithDimentionByName(
+            decl_with_dimention = design_unit.declarations.findDeclWithDimentionByName(
                 tmp[1]
             )
             if decl_with_dimention is not None:

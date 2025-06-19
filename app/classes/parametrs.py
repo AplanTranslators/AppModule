@@ -5,7 +5,7 @@ from ..classes.basic import Basic, BasicArray
 class Parametr(Basic):
     """
     Represents a single parameter in a hardware description language (HDL) context,
-    such as a module parameter, port, or local variable.
+    such as a design_unit parameter, port, or local variable.
 
     It extends the `Basic` class to inherit fundamental properties like `identifier`
     and `source_interval`.
@@ -39,7 +39,7 @@ class Parametr(Basic):
 
         self.param_type: str = param_type  # Use param_type instead of type
         self.module_name: Optional[str] = (
-            None  # Name of the module this parameter belongs to, if applicable.
+            None  # Name of the design_unit this parameter belongs to, if applicable.
         )
 
         # Original: if len(action_name) > 0: action_name += "_"
@@ -230,7 +230,7 @@ class ParametrArray(BasicArray):
     def getIdentifiersListString(self, parametrs_count: int) -> str:
         """
         Generates a comma-separated string of parameter identifiers, enclosed in parentheses.
-        This is typically used for function/module call arguments or port lists.
+        This is typically used for function/design_unit call arguments or port lists.
 
         Args:
             parametrs_count (int): The number of parameters expected or desired in the string.

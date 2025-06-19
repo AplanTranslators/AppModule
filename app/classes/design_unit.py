@@ -1,21 +1,21 @@
-from ..classes.parametrs import ParametrArray
-from ..classes.processed import ProcessedElementArray
-from ..classes.actions import ActionArray
-from ..classes.typedef import TypedefArray
-from ..classes.value_parametrs import ValueParametrArray
-from ..classes.protocols import ProtocolArray
-from ..classes.declarations import DeclTypes, DeclarationArray
-from ..classes.structure import StructureArray
-from ..classes.basic import Basic, BasicArray
-from ..classes.element_types import ElementsTypes
-from ..classes.tasks import TaskArray
+from .parametrs import ParametrArray
+from .processed import ProcessedElementArray
+from .actions import ActionArray
+from .typedef import TypedefArray
+from .value_parametrs import ValueParametrArray
+from .protocols import ProtocolArray
+from .declarations import DeclTypes, DeclarationArray
+from .structure import StructureArray
+from .basic import Basic, BasicArray
+from .element_types import ElementsTypes
+from .tasks import TaskArray
 from typing import Any, List, Optional, Tuple, Union
 import re
 
 
-class Module(Basic):
+class DesignUnit(Basic):
     """
-    Represents a hardware module, a software class, or a similar encapsulated entity
+    Represents a hardware design_unit, a software class, or a similar encapsulated entity
     within a design. It aggregates various types of elements, including declarations,
     typedefs, actions, structures, parameters, and nested modules/objects,
     providing a holistic view of a design component.
@@ -30,18 +30,18 @@ class Module(Basic):
         name_space_level: int = 0,
     ):
         """
-        Initializes a new `Module` instance.
+        Initializes a new `DesignUnit` instance.
 
         Args:
-            identifier (str): The common name of the module (e.g., "my_fifo", "Processor").
+            identifier (str): The common name of the design_unit (e.g., "my_fifo", "Processor").
             source_interval (Tuple[int, int]): The (start, end) character positions
-                                                in the original source file where the module is defined.
-            ident_uniq_name (str): A unique identifier for this module across the entire design,
+                                                in the original source file where the design_unit is defined.
+            ident_uniq_name (str): A unique identifier for this design_unit across the entire design,
                                    often including hierarchical path information.
-            element_type (ElementsTypes, optional): The specific type of element this module represents.
+            element_type (ElementsTypes, optional): The specific type of element this design_unit represents.
                                                     Defaults to `ElementsTypes.MODULE_ELEMENT`.
                                                     Can be `ElementsTypes.CLASS_ELEMENT` for software classes.
-            name_space_level (int, optional): The nesting level of this module within the design hierarchy.
+            name_space_level (int, optional): The nesting level of this design_unit within the design hierarchy.
                                               Defaults to 0 (top-level).
         """
         # Convert identifier to uppercase immediately for internal consistency.
@@ -57,7 +57,7 @@ class Module(Basic):
 
         self.number: int = name_space_level
 
-        # Initialize collections for various sub-elements within the module.
+        # Initialize collections for various sub-elements within the design_unit.
         # These are instances of custom array classes, enabling structured storage and operations.
         self.declarations: "DeclarationArray" = DeclarationArray()
         self.typedefs: "TypedefArray" = TypedefArray()
@@ -65,115 +65,115 @@ class Module(Basic):
         self.structures: "StructureArray" = StructureArray()
         self.out_of_block_elements: "ProtocolArray" = (
             ProtocolArray()
-        )  # Elements representing module's main protocol
+        )  # Elements representing design_unit's main protocol
         self.value_parametrs: "ValueParametrArray" = ValueParametrArray()
         self.input_parametrs: "ParametrArray" = ParametrArray()
         self.processed_elements: "ProcessedElementArray" = ProcessedElementArray()
         self.tasks: "TaskArray" = TaskArray()
-        self.packages_and_objects: "ModuleArray" = (
-            ModuleArray()
+        self.packages_and_objects: "DesignUnitArray" = (
+            DesignUnitArray()
         )  # For nested modules or class instances
 
     # Type hint for copy return type: Self for Python 3.11+, else forward reference str
-    def copyPart(self) -> "Module":
+    def copyPart(self) -> "DesignUnit":
         """
-        Creates a 'partial' shallow copy of the `Module` instance.
+        Creates a 'partial' shallow copy of the `DesignUnit` instance.
         Most of the contained `BasicArray` objects are copied by reference (shallow copy),
-        meaning the new module will share these collections with the original.
-        Modifications to these shared arrays in the copied module will affect the original.
+        meaning the new design_unit will share these collections with the original.
+        Modifications to these shared arrays in the copied design_unit will affect the original.
 
-        This method is useful when only the module's core attributes and
+        This method is useful when only the design_unit's core attributes and
         references to its top-level element arrays are needed, without duplicating
         the potentially large contents of those arrays.
 
         Returns:
-            Module: A new `Module` object with shared (shallow-copied) internal arrays.
+            DesignUnit: A new `DesignUnit` object with shared (shallow-copied) internal arrays.
         """
-        module = Module(
+        design_unit = DesignUnit(
             self.identifier,
             self.source_interval,
             self.ident_uniq_name,
             self.element_type,
             self.number,  # Pass name_space_level to copy constructor
         )
-        module.number = self.number  # Ensure number is also copied
+        design_unit.number = self.number  # Ensure number is also copied
 
         # Shallow copy of references to the internal arrays
-        module.declarations = self.declarations
-        module.actions = self.actions
-        module.structures = self.structures
-        module.out_of_block_elements = self.out_of_block_elements
-        module.value_parametrs = self.value_parametrs
-        module.processed_elements = self.processed_elements
-        module.tasks = self.tasks
-        module.packages_and_objects = self.packages_and_objects
+        design_unit.declarations = self.declarations
+        design_unit.actions = self.actions
+        design_unit.structures = self.structures
+        design_unit.out_of_block_elements = self.out_of_block_elements
+        design_unit.value_parametrs = self.value_parametrs
+        design_unit.processed_elements = self.processed_elements
+        design_unit.tasks = self.tasks
+        design_unit.packages_and_objects = self.packages_and_objects
         # Missing typedefs and input_parametrs from shallow copy
 
-        return module
+        return design_unit
 
     # Type hint for copy return type: Self for Python 3.11+, else forward reference str
-    def copy(self) -> "Module":
+    def copy(self) -> "DesignUnit":
         """
-        Creates a deep copy of the `Module` instance.
+        Creates a deep copy of the `DesignUnit` instance.
         All contained `BasicArray` objects are also deep-copied by calling their
-        respective `.copy()` methods. This ensures that the new module instance
+        respective `.copy()` methods. This ensures that the new design_unit instance
         and all its contents are independent of the original.
 
         Additionally, it calls `updateLinks` on certain copied arrays (`structures`,
         `out_of_block_elements`) to ensure their internal references correctly
-        point to the newly created `Module` instance.
+        point to the newly created `DesignUnit` instance.
 
         Returns:
-            Module: A completely independent deep copy of the `Module` object.
+            DesignUnit: A completely independent deep copy of the `DesignUnit` object.
         """
-        module = Module(
+        design_unit = DesignUnit(
             self.identifier,
             self.source_interval,
             self.ident_uniq_name,
             self.element_type,
             self.number,  # Pass name_space_level to copy constructor
         )
-        module.number = self.number  # Ensure number is also copied
+        design_unit.number = self.number  # Ensure number is also copied
 
         # Deep copy all contained BasicArray instances
-        module.declarations = self.declarations.copy()
-        module.typedefs = self.typedefs.copy()  # Added typedefs to deep copy
-        module.actions = self.actions.copy()
-        module.structures = self.structures.copy()
-        # After copying structures, update their internal links to the new module instance
-        module.structures.updateLinks(
-            module
+        design_unit.declarations = self.declarations.copy()
+        design_unit.typedefs = self.typedefs.copy()  # Added typedefs to deep copy
+        design_unit.actions = self.actions.copy()
+        design_unit.structures = self.structures.copy()
+        # After copying structures, update their internal links to the new design_unit instance
+        design_unit.structures.updateLinks(
+            design_unit
         )  # Assumes StructureArray has updateLinks method
 
-        module.out_of_block_elements = self.out_of_block_elements.copy()
-        # After copying out_of_block_elements, update their internal links to the new module instance
-        module.out_of_block_elements.updateLinks(
-            module
+        design_unit.out_of_block_elements = self.out_of_block_elements.copy()
+        # After copying out_of_block_elements, update their internal links to the new design_unit instance
+        design_unit.out_of_block_elements.updateLinks(
+            design_unit
         )  # Assumes ProtocolArray has updateLinks method
 
-        module.value_parametrs = self.value_parametrs.copy()
-        module.input_parametrs = (
+        design_unit.value_parametrs = self.value_parametrs.copy()
+        design_unit.input_parametrs = (
             self.input_parametrs.copy()
         )  # Added input_parametrs to deep copy
-        module.processed_elements = self.processed_elements.copy()
-        module.tasks = self.tasks.copy()
-        module.packages_and_objects = self.packages_and_objects.copy()
+        design_unit.processed_elements = self.processed_elements.copy()
+        design_unit.tasks = self.tasks.copy()
+        design_unit.packages_and_objects = self.packages_and_objects.copy()
 
-        return module
+        return design_unit
 
     def findAndChangeNamesToAgentAttrCall(
-        self, input_string: str, packages: Optional[List["Module"]] = None
+        self, input_string: str, packages: Optional[List["DesignUnit"]] = None
     ) -> str:
         """
         Transforms identifiers in a given input string to an "agent attribute call" format.
         This means prefixing identifiers with either "object_pointer." (for classes)
-        or the module's unique name (for regular modules).
-        It processes both the current module's declarations and, optionally,
+        or the design_unit's unique name (for regular modules).
+        It processes both the current design_unit's declarations and, optionally,
         declarations from a list of external packages/modules.
 
         Args:
             input_string (str): The string in which identifiers need to be transformed.
-            packages (Optional[List[Module]]): An optional list of other `Module` instances
+            packages (Optional[List[DesignUnit]]): An optional list of other `DesignUnit` instances
                                                 (e.g., imported packages) whose declarations
                                                 should also be considered for transformation.
 
@@ -185,10 +185,10 @@ class Module(Basic):
             # For class elements, typically use a generic "object_pointer"
             ident_prefix = "object_pointer"
         else:
-            # For regular modules, use the module's unique name
+            # For regular modules, use the design_unit's unique name
             ident_prefix = self.ident_uniq_name
 
-        # Process declarations within the current module
+        # Process declarations within the current design_unit
         for elem in self.declarations.getElements():
             # Use word boundaries (\b) to ensure only whole words are replaced
             # Use `elem.getName()` if it consistently provides the string to be used in the output.
@@ -222,7 +222,7 @@ class Module(Basic):
 
     def isIncludeOutOfBlockElements(self) -> bool:
         """
-        Checks if this module contains any "out-of-block" elements (protocol elements).
+        Checks if this design_unit contains any "out-of-block" elements (protocol elements).
 
         Returns:
             bool: True if `out_of_block_elements` array is not empty, False otherwise.
@@ -290,7 +290,7 @@ class Module(Basic):
 
     def getInputParametrs(self) -> str:
         """
-        Generates a parenthesized string of input parameters for the module,
+        Generates a parenthesized string of input parameters for the design_unit,
         formatted as `(param1, param2, ...)`.
 
         Returns:
@@ -304,8 +304,8 @@ class Module(Basic):
 
     def _format_main_protocol_section(self, parametrs: str) -> Tuple[str, str, bool]:
         """
-        Helper method to format the 'MAIN_PROTOCOL' section of the module's behavior.
-        This section represents the primary operational flow of the module,
+        Helper method to format the 'MAIN_PROTOCOL' section of the design_unit's behavior.
+        This section represents the primary operational flow of the design_unit,
         combining `out_of_block_elements` with specific separators (`;` or `||`)
         and conditional parentheses.
 
@@ -340,7 +340,7 @@ class Module(Basic):
                     main_protocol_body_parts.append(" || ")
 
                 # Add opening parenthesis for specific transitions:
-                # If previous element was an assignment OUT_OF_BLOCK and current is a module call/assign
+                # If previous element was an assignment OUT_OF_BLOCK and current is a design_unit call/assign
                 if (
                     prev_element.element_type
                     == ElementsTypes.ASSIGN_OUT_OF_BLOCK_ELEMENT
@@ -354,7 +354,7 @@ class Module(Basic):
             main_protocol_body_parts.append(element.identifier)
 
             # Add closing parenthesis for specific transitions:
-            # If next element is an assignment OUT_OF_BLOCK and current is a module call/assign
+            # If next element is an assignment OUT_OF_BLOCK and current is a design_unit call/assign
             if index + 1 < len(protocols_list):
                 next_element = protocols_list[index + 1]
                 if (
@@ -462,7 +462,7 @@ class Module(Basic):
         """
         Helper method to format the 'INIT_PROTOCOL' section.
         This section typically contains initialization expressions for declarations
-        within the module, joined by '.'.
+        within the design_unit, joined by '.'.
 
         Args:
             parametrs (str): The formatted input parameters string (e.g., "(a, b)").
@@ -511,7 +511,7 @@ class Module(Basic):
     def getBehInitProtocols(self) -> str:
         """
         Generates a comprehensive behavioral and initialization protocol string
-        for the module, suitable for output in a specific Aplan-like format.
+        for the design_unit, suitable for output in a specific Aplan-like format.
         It combines sections for MAIN protocol, ALWAYS part, STRUCT part, and INIT protocol,
         and then constructs a top-level B0 protocol that orchestrates these parts.
 
@@ -604,11 +604,11 @@ class Module(Basic):
 
     def __repr__(self) -> str:
         """
-        Returns a developer-friendly string representation of the `Module` object,
+        Returns a developer-friendly string representation of the `DesignUnit` object,
         displaying its core identifiers and type for debugging and introspection.
         """
         return (
-            f"Module("
+            f"DesignUnit("
             f"identifier={self.identifier!r}, "
             f"source_interval={self.source_interval!r}, "
             f"ident_uniq_name={self.ident_uniq_name!r}, "
@@ -618,47 +618,47 @@ class Module(Basic):
         )
 
 
-class ModuleArray(BasicArray):
+class DesignUnitArray(BasicArray):
     """
-    A specialized array for managing a collection of `Module` objects.
+    A specialized array for managing a collection of `DesignUnit` objects.
     This class extends `BasicArray` and provides methods for adding, finding,
-    and filtering `Module` instances.
+    and filtering `DesignUnit` instances.
     """
 
     def __init__(self):
         """
-        Initializes a new `ModuleArray` instance, specifically configured
-        to store objects of type `Module`.
+        Initializes a new `DesignUnitArray` instance, specifically configured
+        to store objects of type `DesignUnit`.
         """
         super().__init__(
-            Module
-        )  # Use string literal if Module is defined later or in a cycle
+            DesignUnit
+        )  # Use string literal if DesignUnit is defined later or in a cycle
 
     # Type hint for copy return type: Self for Python 3.11+, else forward reference str
-    def copy(self) -> "ModuleArray":
+    def copy(self) -> "DesignUnitArray":
         """
-        Creates a deep copy of the current `ModuleArray` instance.
-        It iterates through all contained `Module` objects and adds their
+        Creates a deep copy of the current `DesignUnitArray` instance.
+        It iterates through all contained `DesignUnit` objects and adds their
         deep copies to the new array, ensuring full independence.
 
         Returns:
-            ModuleArray: A new `ModuleArray` containing deep copies of all
+            DesignUnitArray: A new `DesignUnitArray` containing deep copies of all
                          original modules.
         """
-        new_array = ModuleArray()
+        new_array = DesignUnitArray()
         for element in self.elements:  # Iterate directly over the internal list
-            new_array.addElement(element.copy())  # Use Module's deep copy method
+            new_array.addElement(element.copy())  # Use DesignUnit's deep copy method
         return new_array
 
-    def findModuleByUniqIdentifier(self, ident_uniq_name: str) -> Optional["Module"]:
+    def findModuleByUniqIdentifier(self, ident_uniq_name: str) -> Optional["DesignUnit"]:
         """
-        Finds a `Module` object in the array by its unique identifier.
+        Finds a `DesignUnit` object in the array by its unique identifier.
 
         Args:
-            ident_uniq_name (str): The unique identifier of the module to find.
+            ident_uniq_name (str): The unique identifier of the design_unit to find.
 
         Returns:
-            Optional[Module]: The `Module` object if found, otherwise None.
+            Optional[DesignUnit]: The `DesignUnit` object if found, otherwise None.
         """
         for element in self.elements:
             if (
@@ -667,24 +667,24 @@ class ModuleArray(BasicArray):
                 return element
         return None
 
-    def getElements(self) -> List["Module"]:
+    def getElements(self) -> List["DesignUnit"]:
         """
-        Returns the internal list of `Module` elements directly.
+        Returns the internal list of `DesignUnit` elements directly.
 
         Returns:
-            List[Module]: A list of `Module` objects.
+            List[DesignUnit]: A list of `DesignUnit` objects.
         """
         return self.elements
 
-    def getElementByIndex(self, index: int) -> "Module":
+    def getElementByIndex(self, index: int) -> "DesignUnit":
         """
-        Retrieves a `Module` object from the array by its zero-based index.
+        Retrieves a `DesignUnit` object from the array by its zero-based index.
 
         Args:
             index (int): The index of the element to retrieve.
 
         Returns:
-            Module: The `Module` object at the specified index.
+            DesignUnit: The `DesignUnit` object at the specified index.
 
         Raises:
             IndexError: If the index is out of bounds.
@@ -697,9 +697,9 @@ class ModuleArray(BasicArray):
         exclude: Optional["ElementsTypes"] = None,
         include_ident_uniq_names: Optional[List[str]] = None,
         exclude_ident_uniq_name: Optional[str] = None,
-    ) -> "ModuleArray":
+    ) -> "DesignUnitArray":
         """
-        Filters the `Module` objects in the array based on various criteria,
+        Filters the `DesignUnit` objects in the array based on various criteria,
         including `element_type` and unique identifiers.
 
         Args:
@@ -710,11 +710,11 @@ class ModuleArray(BasicArray):
             exclude_ident_uniq_name (Optional[str]): Exclude modules with this specific unique identifier.
 
         Returns:
-            ModuleArray: A new `ModuleArray` containing only the modules that
+            DesignUnitArray: A new `DesignUnitArray` containing only the modules that
                          match all specified filtering criteria. If no criteria are
                          provided, a deep copy of the original array is returned.
         """
-        result: "ModuleArray" = ModuleArray()
+        result: "DesignUnitArray" = DesignUnitArray()
 
         # If no filters are specified, return a deep copy of the entire array.
         if all(
@@ -756,17 +756,17 @@ class ModuleArray(BasicArray):
 
     def __repr__(self) -> str:
         """
-        Returns a developer-friendly string representation of the `ModuleArray` object,
+        Returns a developer-friendly string representation of the `DesignUnitArray` object,
         displaying the `repr` of its internal elements list for debugging.
         """
-        return f"ModuleArray(\n{self.elements!r}\n)"
+        return f"DesignUnitArray(\n{self.elements!r}\n)"
 
     # Add standard container methods for better usability and Pythonic behavior
     def __len__(self) -> int:
         """Returns the number of elements in the array. Enables `len(instance)`."""
         return len(self.elements)
 
-    def __getitem__(self, index: Union[int, slice]) -> Union["Module", List["Module"]]:
+    def __getitem__(self, index: Union[int, slice]) -> Union["DesignUnit", List["DesignUnit"]]:
         """Allows direct indexing and slicing of the array, e.g., `array[0]` or `array[1:3]`."""
         return self.elements[index]
 

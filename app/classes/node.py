@@ -25,7 +25,7 @@ class Node(Basic):
     """
     Represents a fundamental element or a "node" in an abstract syntax tree (AST)
     or an expression. It can be an identifier, a literal, an operator,
-    or part of a complex expression with module qualification or bit/range selections.
+    or part of a complex expression with design_unit qualification or bit/range selections.
 
     Extends `Basic` to inherit properties like identifier, source interval, and element type.
     """
@@ -56,7 +56,7 @@ class Node(Basic):
             None  # The full string expression this node is part of, or represents.
         )
         self.module_name: Optional[str] = (
-            None  # If this node represents a signal within a module instance,
+            None  # If this node represents a signal within a design_unit instance,
         )
         # this holds the instance name (e.g., `U1.signal_name`).
         self.bit_selection: bool = (
@@ -84,7 +84,7 @@ class Node(Basic):
 
     def getName(self) -> str:
         """
-        Generates a formatted name for the node, incorporating module qualification
+        Generates a formatted name for the node, incorporating design_unit qualification
         and specific formatting for bit/range selections.
 
         This method aims to reconstruct a representation of the node's identifier
@@ -96,7 +96,7 @@ class Node(Basic):
         """
         result = self.identifier
 
-        # Prepend module name if present (e.g., "module.signal")
+        # Prepend design_unit name if present (e.g., "design_unit.signal")
         if self.module_name:
             result = f"{self.module_name}.{result}"
 

@@ -10,14 +10,14 @@ def create_Beh_File(self: "Program"):
     # Behaviour
     # ----------------------------------
     behaviour = []
-    for index, module in enumerate(
+    for index, design_unit in enumerate(
         self.modules.getElementsIE(exclude=ElementsTypes.OBJECT_ELEMENT).getElements()
     ):
 
         raw_protocol_strings = [
-            module.getBehInitProtocols(),
-            module.structures.getStructuresInStrFormat(),
-            module.out_of_block_elements.getProtocolsInStrFormat(),
+            design_unit.getBehInitProtocols(),
+            design_unit.structures.getStructuresInStrFormat(),
+            design_unit.out_of_block_elements.getProtocolsInStrFormat(),
         ]
         tmp = [s for s in raw_protocol_strings if s and s.strip()]
         tmp = "\n".join(tmp)

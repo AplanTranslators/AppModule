@@ -1,7 +1,7 @@
 # App-Module
 
 
-This is an application module, it includes tools and basic structures for generating Aplan Files.
+This is an application design_unit, it includes tools and basic structures for generating Aplan Files.
 
 It provides tools such as:
     - TranlatorTool - A basic tool that performs translation of a specified file (SV or VHDL) depending on the provided translator.

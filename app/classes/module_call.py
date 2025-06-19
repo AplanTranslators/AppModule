@@ -7,10 +7,10 @@ import re
 
 class ModuleCall(Basic):
     """
-    Represents an instance of a module call (instantiation) in a hardware description
-    language (HDL) context (e.g., SystemVerilog module instantiation).
+    Represents an instance of a design_unit call (instantiation) in a hardware description
+    language (HDL) context (e.g., SystemVerilog design_unit instantiation).
 
-    This class encapsulates information about the module being instantiated,
+    This class encapsulates information about the design_unit being instantiated,
     the name of the instance, and how its parameters are connected.
     It extends `Basic` for fundamental properties like identifier and source interval.
     """
@@ -40,9 +40,9 @@ class ModuleCall(Basic):
 
     def __init__(
         self,
-        identifier: str,  # The unique name of this module *instance*
-        object_name: str,  # The name of the *module definition* being called (e.g., 'my_module' in `my_module instance_name(...)`)
-        source_identifier: str,  # The identifier from the source definition (e.g., module name)
+        identifier: str,  # The unique name of this design_unit *instance*
+        object_name: str,  # The name of the *design_unit definition* being called (e.g., 'my_module' in `my_module instance_name(...)`)
+        source_identifier: str,  # The identifier from the source definition (e.g., design_unit name)
         destination_identifier: str,  # The identifier in the destination context (e.g., instance name)
         parameter_value_assignment: Optional[str] = None,
         source_parametrs: Optional[ValueParametrArray] = None,
@@ -51,10 +51,10 @@ class ModuleCall(Basic):
         Initializes a new `ModuleCall` instance.
 
         Args:
-            identifier (str): The unique identifier for this module *instance* (e.g., "U1" or "my_instance").
+            identifier (str): The unique identifier for this design_unit *instance* (e.g., "U1" or "my_instance").
                               This is also passed to the `Basic` parent.
-            object_name (str): The name of the module *definition* being instantiated (e.g., "my_adder").
-            source_identifier (str): The identifier of the source component (likely the module being instantiated).
+            object_name (str): The name of the design_unit *definition* being instantiated (e.g., "my_adder").
+            source_identifier (str): The identifier of the source component (likely the design_unit being instantiated).
                                      This might be redundant with `object_name` depending on context,
                                      but kept for original intent.
             destination_identifier (str): The identifier of the destination component.
@@ -77,7 +77,7 @@ class ModuleCall(Basic):
         self.source_identifier: str = source_identifier
         self.destination_identifier: str = destination_identifier
 
-        # `paramets` stores `ValueParametr` objects that are associated with this module call.
+        # `paramets` stores `ValueParametr` objects that are associated with this design_unit call.
         self.paramets: ValueParametrArray = ValueParametrArray()
 
         # If parameter assignments and source parameters are provided, process them.
@@ -92,7 +92,7 @@ class ModuleCall(Basic):
                 # in the provided `source_parametrs` array.
                 source_parametr = source_parametrs.getElement(source_value_expr)
                 if source_parametr is not None:
-                    # If found, add the resolved source parameter to this module call's parameters.
+                    # If found, add the resolved source parameter to this design_unit call's parameters.
                     self.paramets.addElement(source_parametr)
 
     def __repr__(self) -> str:
@@ -114,7 +114,7 @@ class ModuleCall(Basic):
     def __str__(self) -> str:
         """
         Returns a human-readable string representation of the `ModuleCall` object.
-        This provides a concise summary of the module instantiation.
+        This provides a concise summary of the design_unit instantiation.
         """
         params_str = ""
         if len(self.paramets) > 0:
@@ -134,7 +134,7 @@ class ModuleCallArray(BasicArray):
     """
     A specialized array for managing a collection of `ModuleCall` objects.
     This class extends `BasicArray` and provides specific methods for
-    finding and filtering module calls within a design.
+    finding and filtering design_unit calls within a design.
     """
 
     def __init__(self):
@@ -146,16 +146,16 @@ class ModuleCallArray(BasicArray):
 
     def findModuleByUniqIdentifier(self, object_name: str) -> Optional[ModuleCall]:
         """
-        Finds a `ModuleCall` object based on the unique name of the module *definition*
+        Finds a `ModuleCall` object based on the unique name of the design_unit *definition*
         being instantiated (`object_name`).
 
         Args:
-            object_name (str): The name of the module definition (e.g., "my_adder")
+            object_name (str): The name of the design_unit definition (e.g., "my_adder")
                                to search for among the instantiated modules.
 
         Returns:
             Optional[ModuleCall]: The first `ModuleCall` object found that instantiates
-                                   a module with the given `object_name`, or `None` if not found.
+                                   a design_unit with the given `object_name`, or `None` if not found.
         """
         for element in self.elements:
             if element.object_name == object_name:
@@ -174,13 +174,13 @@ class ModuleCallArray(BasicArray):
         This method primarily supports filtering by `ElementsTypes` and instance identifiers.
 
         Args:
-            include (Optional[ElementsTypes]): If provided, only include module calls
+            include (Optional[ElementsTypes]): If provided, only include design_unit calls
                                                of this specific `ElementsTypes`.
-            exclude (Optional[ElementsTypes]): If provided, exclude module calls
+            exclude (Optional[ElementsTypes]): If provided, exclude design_unit calls
                                                of this specific `ElementsTypes`.
-            include_identifier (Optional[str]): If provided, only include module calls
+            include_identifier (Optional[str]): If provided, only include design_unit calls
                                                 matching this instance identifier.
-            exclude_identifier (Optional[str]): If provided, exclude module calls
+            exclude_identifier (Optional[str]): If provided, exclude design_unit calls
                                                 matching this instance identifier.
 
         Returns:
@@ -230,7 +230,7 @@ class ModuleCallArray(BasicArray):
     def __str__(self) -> str:
         """
         Returns a human-readable string representation of the `ModuleCallArray`.
-        Each module call is represented on a new line.
+        Each design_unit call is represented on a new line.
         """
         return "\n".join(str(call) for call in self.elements)
 

@@ -501,18 +501,18 @@ class Protocol(Basic):
 
         return display_identifier
 
-    def updateLinks(self, module: Any) -> None:
+    def updateLinks(self, design_unit: Any) -> None:
         """
         Updates internal references (links) within the protocol's body.
         This method iterates through the `BodyElement`s in the protocol's `body`.
         If a `BodyElement`'s identifier corresponds to a known 'action' in the
-        provided `module`, it replaces the `BodyElement` with the actual 'action' object.
+        provided `design_unit`, it replaces the `BodyElement` with the actual 'action' object.
 
         This mechanism is crucial for resolving symbolic references to actual objects.
 
         Args:
-            module (Any): An object representing a module, expected to have an
-                          `actions` attribute (e.g., `module.actions`) which is
+            design_unit (Any): An object representing a design_unit, expected to have an
+                          `actions` attribute (e.g., `design_unit.actions`) which is
                           a collection (like `BasicArray`) containing callable
                           'action' elements. It also needs a `utils` object
                           (e.g., `self.utils`) to extract function names.
@@ -533,10 +533,10 @@ class Protocol(Basic):
             func_name = self.utils.extractFunctionName(element.identifier)
 
             if func_name:  # If a function name was successfully extracted
-                # Try to find the corresponding action in the module's actions collection
-                action = module.actions.getElement(
+                # Try to find the corresponding action in the design_unit's actions collection
+                action = design_unit.actions.getElement(
                     func_name
-                )  # Assumes module.actions has getElement method
+                )  # Assumes design_unit.actions has getElement method
 
                 if action:
                     # If the action is found, replace the BodyElement at this index
@@ -674,18 +674,18 @@ class ProtocolArray(BasicArray):
 
         return result_array
 
-    def updateLinks(self, module: Any) -> None:
+    def updateLinks(self, design_unit: Any) -> None:
         """
         Calls the `updateLinks` method for each `Protocol` object within this array.
         This cascades the link-updating process down to the individual protocols
         and their bodies.
 
         Args:
-            module (Any): An object representing a module, passed down to each protocol's
+            design_unit (Any): An object representing a design_unit, passed down to each protocol's
                           `updateLinks` method.
         """
         for element in self.elements:  # Iterate directly over the internal list
-            element.updateLinks(module)
+            element.updateLinks(design_unit)
 
     def getProtocolsInStrFormat(self) -> str:
         """

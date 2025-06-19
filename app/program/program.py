@@ -7,7 +7,7 @@ from ..program.env import create_ENV_File
 from ..program.evt import create_EVT_File
 from ..utils.singleton import SingletonMeta
 from ..classes.typedef import TypedefArray
-from ..classes.module import ModuleArray
+from ..classes.design_unit import DesignUnitArray
 from ..classes.module_call import ModuleCallArray
 import os
 
@@ -19,7 +19,7 @@ class Program(metaclass=SingletonMeta):
 
     def __init__(self, path_to_result: str = None) -> None:
         self.path_to_result = path_to_result
-        self.modules: ModuleArray = ModuleArray()
+        self.modules: DesignUnitArray = DesignUnitArray()
         self._module_calls: ModuleCallArray = ModuleCallArray()
         self._typedefs: TypedefArray = TypedefArray()
 
