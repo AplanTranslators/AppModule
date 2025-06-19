@@ -130,7 +130,7 @@ class BaseTool:
 
             if self.file_manager.is_testing_file(path, self._type.lower()):
                 file_data = program.readFileData(path)
-                self.translation_mngr.setup(file_data)
+                self.translation_mngr.setup(file_data, path)
                 self.translation_mngr.translate()
 
             program.create_result_dirrectory()
