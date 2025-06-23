@@ -18,7 +18,6 @@ class CaseStmt(Structure):
         self,
         identifier: str,
         source_interval: Tuple[int, int],
-        name_space_level: int,
     ):
         """
         Initializes a new CaseStmt instance.
@@ -36,7 +35,6 @@ class CaseStmt(Structure):
             identifier,
             source_interval,
             element_type=ElementsTypes.CASE_STATEMENT_ELEMENT,
-            name_space_level=name_space_level,
         )
         # The expression that the case statement evaluates.
         # This is typed as a specific ANTLR4 parser context, allowing direct access

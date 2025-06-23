@@ -16,7 +16,6 @@ class LoopStmt(Structure):
         self,
         identifier: str,
         source_interval: Tuple[int, int],
-        name_space_level: int,
     ):
         """
         Initializes a new `LoopStmt` instance.
@@ -35,7 +34,6 @@ class LoopStmt(Structure):
             identifier,
             source_interval,
             element_type=ElementsTypes.LOOP_ELEMENT,
-            name_space_level=name_space_level,
         )
         # A flag to explicitly indicate that this instance represents a loop.
         # While the element_type also indicates this, a boolean flag can be
@@ -71,7 +69,6 @@ class ForeverStmt(Structure):
         self,
         identifier: str,
         source_interval: Tuple[int, int],
-        name_space_level: int,
     ):
         """
         Initializes a new `ForeverStmt` instance.
@@ -90,7 +87,6 @@ class ForeverStmt(Structure):
             identifier,
             source_interval,
             element_type=ElementsTypes.FOREVER_ELEMENT,
-            name_space_level=name_space_level,
         )
         # A flag to explicitly indicate that this instance represents a forever loop.
         self.is_forever: bool = True
@@ -125,7 +121,6 @@ class WhileStmt(Structure):
         self,
         identifier: str,
         source_interval: Tuple[int, int],
-        name_space_level: int,
     ):
         """
         Initializes a new `WhileStmt` instance.
@@ -144,7 +139,6 @@ class WhileStmt(Structure):
             identifier,
             source_interval,
             element_type=ElementsTypes.WHILE_ELEMENT,
-            name_space_level=name_space_level,
         )
         # A flag to explicitly indicate that this instance represents a while loop.
         self.is_while: bool = True

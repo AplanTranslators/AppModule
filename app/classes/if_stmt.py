@@ -18,7 +18,6 @@ class IfStmt(Structure):
         self,
         identifier: str,
         source_interval: Tuple[int, int],
-        name_space_level: int,
     ):
         """
         Initializes a new `IfStmt` instance.
@@ -37,7 +36,6 @@ class IfStmt(Structure):
             identifier,
             source_interval,
             element_type=ElementsTypes.IF_STATEMENT_ELEMENT,
-            name_space_level=name_space_level,
         )
         # Counter for 'else' or 'else if' branches encountered.
         self.else_count: int = 0

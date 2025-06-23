@@ -22,7 +22,6 @@ class Structure(Basic):
         identifier: str,
         source_interval: Tuple[int, int],
         element_type: ElementsTypes = ElementsTypes.NONE_ELEMENT,
-        name_space_level: int = 0,  # Renamed for clarity, often indicates hierarchical depth
     ):
         """
         Initializes a new `Structure` instance.
@@ -58,7 +57,8 @@ class Structure(Basic):
 
         # `number` is set from `name_space_level` and can be updated by `setNumber`.
         # It's used for unique naming in `getName`.
-        self.number: int = name_space_level
+        self.number: int = self.counters.get(self.counters.types.STRUCT_COUNTER)
+        self.counters.incriese(self.counters.types.STRUCT_COUNTER)
 
         # `inside_the_task` flag influences how parameters are handled when adding new protocols.
         self.inside_the_task: bool = False

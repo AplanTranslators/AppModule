@@ -27,7 +27,6 @@ class DesignUnit(Basic):
         source_interval: Tuple[int, int],
         ident_uniq_name: str,  # Changed type hint from Any to str
         element_type: "ElementsTypes" = ElementsTypes.MODULE_ELEMENT,
-        name_space_level: int = 0,
     ):
         """
         Initializes a new `DesignUnit` instance.
@@ -55,8 +54,8 @@ class DesignUnit(Basic):
         )  # Already upper from super().__init__
         self.ident_uniq_name_upper: str = self.ident_uniq_name.upper()
 
-        self.number: int = name_space_level
-
+        self.number: int = self.counters.get(self.counters.types.STRUCT_COUNTER)
+        self.counters.incriese(self.counters.types.STRUCT_COUNTER)
         # Initialize collections for various sub-elements within the design_unit.
         # These are instances of custom array classes, enabling structured storage and operations.
         self.declarations: "DeclarationArray" = DeclarationArray()
