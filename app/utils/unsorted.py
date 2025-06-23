@@ -135,30 +135,3 @@ class UnsortedUnils(metaclass=SingletonMeta):
     def containsOperator(self, s):
         match = re.search(r"[+\-*/&|^~<>=%!]", s)
         return match.group(0) if match else None
-
-    def dataTypeToStr(
-        self,
-        ctx,
-    ):
-        result = None
-        if ctx.integer_vector_type() is not None:
-            result = ctx.integer_vector_type().getText()
-        elif ctx.signing() is not None:
-            result = ctx.signing().getText()
-        elif ctx.integer_atom_type() is not None:
-            result = ctx.integer_atom_type().getText()
-        elif ctx.non_integer_type() is not None:
-            result = ctx.non_integer_type().getText()
-        elif ctx.struct_union() is not None:
-            result = ctx.struct_union().getText()
-        elif ctx.interface_identifier() is not None:
-            result = ctx.interface_identifier().getText()
-        elif ctx.parameter_value_assignment() is not None:
-            result = ctx.parameter_value_assignment().getText()
-        elif ctx.modport_identifier() is not None:
-            result = ctx.modport_identifier().getText()
-        elif ctx.type_identifier() is not None:
-            result = ctx.type_identifier().getText()
-        elif ctx.type_identifier() is not None:
-            result = ctx.type_identifier().getText()
-        return result
