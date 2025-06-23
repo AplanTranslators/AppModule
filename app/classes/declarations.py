@@ -77,7 +77,7 @@ class DeclTypes(Enum):
             return DeclTypes.TIME
         elif type_str == "reg":
             return DeclTypes.REG
-        elif type_str == "logic" or type_str == "STD_LOGIC":
+        elif type_str == "logic" or type_str == "std_logic":
             return DeclTypes.LOGIC
         elif type_str == "wire":
             return DeclTypes.WIRE

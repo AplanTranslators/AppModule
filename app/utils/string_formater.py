@@ -176,9 +176,9 @@ class StringFormater(metaclass=SingletonMeta):
                 value_string = "0b" + value_string
             value = literal_eval(value_string)
             return str(value)
-
         expression = re.sub(pattern, lambda match: replace_match(match), expression)
-
+        expression = str(expression)
+        expression = expression.replace("'", "")
         return expression
 
     def addBracketsAfterNegation(self, expression: str):

@@ -127,6 +127,7 @@ class BaseTool:
 
         try:
             program = Program(path_to_aplan_result)
+            program.path_to_result = path_to_aplan_result
 
             if self.file_manager.is_testing_file(path, self._type.lower()):
                 self.translation_mngr.setup(path)
@@ -187,6 +188,7 @@ class BaseTool:
             )
             self.logger.activate()
             # Основна логіка: виклик start()
+
             has_error = self.start(source_file, result_path)
             self.logger.deactivate()
 
@@ -304,24 +306,25 @@ class BaseTool:
         )
 
     def regeneration_start(
-        self, examples_list_path: str = None, path_to_sv: str = None
+        self, examples_list_path: str = None, path_to_vhdl: str = None
     ) -> int:
         """
         Запускає процес генерації коду: або для всіх прикладів з файлу, або для одного SV-файлу.
         Повертає 0, якщо все успішно, 1, якщо є помилки.
         """
-        if not examples_list_path and not path_to_sv:
+        if not examples_list_path and not path_to_vhdl:
             self.logger.error("Please input path for regeneration.")
             sys.exit(1)
 
-        if path_to_sv is None:
+        if path_to_vhdl is None:
             return self._execute_examples_loop(
                 examples_list_path, self._run_single_generation_wrapper, "GENERATION"
             )
         else:
+
             # Обробка одного файлу окремо, оскільки він не зчитується з JSON-списку
-            directory = os.path.dirname(path_to_sv)
-            source_file = path_to_sv
+            directory = os.path.dirname(path_to_vhdl)
+            source_file = path_to_vhdl
             result_path = os.path.join(
                 directory, "aplan"
             )  # Або інший шлях за замовчуванням для одного файлу
