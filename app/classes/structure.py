@@ -118,9 +118,9 @@ class Structure(Basic):
             # exposes an `addBodyElement` method.
             self.behavior[-1].addBodyElement(body_element)
         else:
-            # Consider logging a warning or raising an error if a BodyElement
-            # is added when there's no existing behavior to attach it to.
-            # print(f"Warning: Cannot add BodyElement to empty behavior list in Structure '{self.identifier}'")
+            self.logger.warning(
+                f"Cannot add BodyElement to empty behavior list in Structure '{self.identifier}'"
+            )
             pass
 
     def updateLinks(self, design_unit: Any) -> None:

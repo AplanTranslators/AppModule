@@ -1,4 +1,6 @@
+import hashlib
 import re
+import string
 from ..utils.logger import Logger
 from ..utils.singleton import SingletonMeta
 
@@ -135,3 +137,44 @@ class UnsortedUnils(metaclass=SingletonMeta):
     def containsOperator(self, s):
         match = re.search(r"[+\-*/&|^~<>=%!]", s)
         return match.group(0) if match else None
+
+    def generate_unique_short_id(self, input_string: str) -> str:
+        """
+        Генерує унікальний 4-символьний ідентифікатор з наданого рядка.
+
+        Використовує перші символи вхідного рядка і доповнює
+        випадковими, якщо рядок коротший за 4 символи.
+        """
+        if not isinstance(input_string, str):
+            raise TypeError("Вхідні дані повинні бути рядком.")
+
+        # Використовуємо хеш SHA-256 для отримання детермінованого, але унікального початку.
+        # Це забезпечує, що для одного й того ж input_string завжди буде однаковий хеш.
+        # Потім кодуємо його в base64 для отримання коротших, друкованих символів.
+        # (Це не прямий base64, а використання urlsafe_b64encode для сумісності з URL)
+        hash_object = hashlib.sha256(input_string.encode("utf-8"))
+
+        # Використовуємо перші 4 байти хешу як основу
+        # Це дозволить отримати більш "випадкові" символи, ніж просто перші символи input_string
+        # якщо input_string дуже схожі (наприклад, "test1" і "test2")
+        base_chars = hash_object.hexdigest()[:4]
+
+        # Довжина бажаного ідентифікатора
+        target_length = 4
+
+        # Доповнюємо, якщо довжина менша за target_length
+        if len(base_chars) < target_length:
+            # Символи для доповнення: літери та цифри
+            fill_chars = string.ascii_letters + string.digits
+
+            # Генеруємо випадкові символи для доповнення
+            num_to_add = target_length - len(base_chars)
+            random_fill = "".join(random.choice(fill_chars) for _ in range(num_to_add))
+
+            # Об'єднуємо базові символи та випадкове доповнення
+            unique_id = base_chars + random_fill
+        else:
+            # Якщо вже 4 або більше, просто обрізаємо до 4
+            unique_id = base_chars[:target_length]
+
+        return unique_id

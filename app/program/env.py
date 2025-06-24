@@ -43,9 +43,11 @@ def create_ENV_File(self: "Program"):
     for design_unit in self.design_units.getElementsIE(
         exclude=ElementsTypes.OBJECT_ELEMENT
     ).getElements():
-        env += "\t\t{0} : obj (\n".format(design_unit.identifier)
+        env += "\t\t{0} : obj (\n".format(design_unit.ident_uniq_name_upper)
         sub_env = ""
-        decls = design_unit.declarations.getElementsIE(data_type_exclude=DeclTypes.ENUM_TYPE)
+        decls = design_unit.declarations.getElementsIE(
+            data_type_exclude=DeclTypes.ENUM_TYPE
+        )
         for index, elem in enumerate(decls.getElements()):
             if index > 0:
                 sub_env += ",\n"
@@ -68,7 +70,7 @@ def create_ENV_File(self: "Program"):
         exclude=ElementsTypes.CLASS_ELEMENT
     ).getElements():
         env += "\t\t{0} : obj ({1}),\n".format(
-            design_unit.identifier, design_unit.ident_uniq_name
+            design_unit.ident_uniq_name_upper, design_unit.ident_uniq_name
         )
     env += "\t\tENVIRONMENT : obj (env)\n"
     env += "\t);\n"

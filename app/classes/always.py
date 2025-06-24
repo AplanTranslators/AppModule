@@ -20,7 +20,6 @@ class Always(Structure):
             str
         ],  # Changed 'sensetive' to 'sensetive' for correct spelling
         source_interval: Tuple[int, int],
-        name_space_level: int,
     ):
         """
         Initializes an Always instance.
@@ -36,7 +35,7 @@ class Always(Structure):
                                     the overall structure or namespace.
         """
         # Call the parent class (Structure) constructor to initialize shared properties.
-        super().__init__(identifier, source_interval, name_space_level=name_space_level)
+        super().__init__(identifier, source_interval)
         # Store the sensitivity list.
         self.sensetive = sensetive
 

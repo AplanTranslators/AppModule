@@ -144,17 +144,20 @@ class Action(Basic):
 
         return action_copy
 
-    def getNameWithParams(self) -> str:
-        """
-        Generates the action's name, including its associated parameters if any exist.
+    def getName(self, include_params: bool = True, to_upper: bool = False) -> str:
 
-        Returns:
-            str: The action identifier, optionally followed by its parameters in parentheses.
-        """
-        if self.parametrs and len(self.parametrs) > 0:
-            return f"{self.identifier}({str(self.parametrs)})"
-        else:
-            return self.identifier
+        display_identifier = self.identifier
+        if to_upper:
+            display_identifier = display_identifier.upper()
+
+        # Append numeric suffix if 'number' is set and non-zero
+        if self.number:  # Checks for truthiness (0 would be False)
+            display_identifier = f"{display_identifier}_{self.number}"
+
+        if include_params:
+            if self.parametrs and len(self.parametrs) > 0:
+                display_identifier = f"{display_identifier}({str(self.parametrs)})"
+        return display_identifier
 
     def findParametrInBodyAndSetParametrs(self, parameters: "ParametrArray"):
         """
@@ -168,8 +171,8 @@ class Action(Basic):
         # It's assumed `self.utils` is available and has an `isVariablePresent` method.
         # If `self.utils` is not defined, this method will raise an AttributeError.
         if not hasattr(self, "utils"):
-            print(
-                "Warning: 'self.utils' is not defined. `findParametrInBodyAndSetParametrs` might not function correctly."
+            self.logger.warning(
+                "'self.utils' is not defined. `findParametrInBodyAndSetParametrs` might not function correctly."
             )
             return
 

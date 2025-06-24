@@ -333,16 +333,6 @@ class TypedefArray(BasicArray):
 
         self.elements.append(new_element)
 
-        # WARNING: This sorting operation is O(N log N) and can be very inefficient
-        # if elements are added one by one to a large array.
-        # Consider if this sorting is truly necessary after every add, or if it can
-        # be done once at the end, or if a different data structure (e.g., a sorted list
-        # implementation or a more optimized insertion strategy) is required.
-        self.elements = sorted(
-            self.elements,
-            key=lambda element: len(element.identifier),
-            reverse=True,  # Sorts by length of identifier, longest first
-        )
         # The index returned here might not be the actual index after sorting.
         # If the index is critical, you might need to find it again after sorting.
         return (

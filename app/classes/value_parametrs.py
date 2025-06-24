@@ -69,8 +69,8 @@ class ValueParametr(Basic):
         # The existence of self.string_formater is an implicit dependency.
         # It should be initialized in `Basic` or explicitly passed/imported.
         if not hasattr(self, "string_formater") or self.string_formater is None:
-            print(
-                f"Warning: `string_formater` not available for ValueParametr '{self.identifier}'. Expression not prepared."
+            self.logger.warning(
+                f"`string_formater` not available for ValueParametr '{self.identifier}'. Expression not prepared."
             )
             return
 
@@ -292,8 +292,8 @@ class ValueParametrArray(BasicArray):
         if len(expression) > 0:
             # Assumption: `self.string_formater` and `self.utils` are available.
             if not hasattr(self, "string_formater") or self.string_formater is None:
-                print(
-                    f"Warning: `string_formater` not available for ValueParametrArray. Cannot substitute calls."
+                self.logger.warning(
+                    f"`string_formater` not available for ValueParametrArray. Cannot substitute calls."
                 )
                 # Fallback: attempt to evaluate without substitution
             else:
@@ -303,8 +303,8 @@ class ValueParametrArray(BasicArray):
                 )
 
             if not hasattr(self, "utils") or self.utils is None:
-                print(
-                    f"Warning: `utils` (expression evaluator) not available. Cannot evaluate expression."
+                self.logger.warning(
+                    f"`utils` (expression evaluator) not available. Cannot evaluate expression."
                 )
                 return expression  # Return raw expression if no evaluator
 

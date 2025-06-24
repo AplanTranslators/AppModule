@@ -786,14 +786,6 @@ class DeclarationArray(BasicArray):
         # Add the new element if unique.
         self.elements.append(new_element)
 
-        # Sort elements by the length of their identifier in reverse order.
-        # This particular sorting strategy (by identifier length, descending)
-        # might be specific to a downstream processing requirement (e.g., for
-        # efficient regex replacement of longer names first).
-        self.elements.sort(
-            key=lambda element: len(element.identifier),
-            reverse=True,
-        )
         # Return True and the index of the newly added element.
         return (True, self.getElementIndex(new_element.identifier))
 
