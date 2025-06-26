@@ -331,12 +331,12 @@ class Declaration(Basic):
         self,
         data_type: DeclTypes,
         identifier: str,
-        expression: str,
-        size_expression: str,
-        size: int,
-        dimension_expression: str,
-        dimension_size: int,
-        source_interval: Tuple[int, int],
+        expression: str = "",
+        size_expression: str = "",
+        size: int = 0,
+        dimension_expression: str = "",
+        dimension_size: int = 0,
+        source_interval: Tuple[int, int] = (0, 0),
         element_type: ElementsTypes = ElementsTypes.NONE_ELEMENT,
         action: Optional[Action] = None,
         struct_name: Optional[str] = None,
@@ -837,6 +837,7 @@ class DeclarationArray(BasicArray):
             # Create a regex pattern to match the whole word (using \b for word boundaries)
             pattern = r"\b" + re.escape(element.identifier) + r"\b"
             # Perform substitution and get the count of replacements
+
             new_expression, count = re.subn(
                 pattern, element.getName(), modified_expression, count=1
             )  # Limit to 1 replacement

@@ -649,7 +649,9 @@ class DesignUnitArray(BasicArray):
             new_array.addElement(element.copy())  # Use DesignUnit's deep copy method
         return new_array
 
-    def findModuleByUniqIdentifier(self, ident_uniq_name: str) -> Optional["DesignUnit"]:
+    def findModuleByUniqIdentifier(
+        self, ident_uniq_name: str
+    ) -> Optional["DesignUnit"] | None:
         """
         Finds a `DesignUnit` object in the array by its unique identifier.
 
@@ -765,7 +767,9 @@ class DesignUnitArray(BasicArray):
         """Returns the number of elements in the array. Enables `len(instance)`."""
         return len(self.elements)
 
-    def __getitem__(self, index: Union[int, slice]) -> Union["DesignUnit", List["DesignUnit"]]:
+    def __getitem__(
+        self, index: Union[int, slice]
+    ) -> Union["DesignUnit", List["DesignUnit"]]:
         """Allows direct indexing and slicing of the array, e.g., `array[0]` or `array[1:3]`."""
         return self.elements[index]
 

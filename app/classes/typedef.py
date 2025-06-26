@@ -1,6 +1,11 @@
 from typing import List, Optional, Tuple, Union
 from ..classes.basic import Basic, BasicArray
-from ..classes.declarations import AplanDeclType, DeclTypes, DeclarationArray
+from ..classes.declarations import (
+    AplanDeclType,
+    DeclTypes,
+    Declaration,
+    DeclarationArray,
+)
 from ..classes.element_types import ElementsTypes
 
 
@@ -41,6 +46,12 @@ class Typedef(Basic):
         self.file_path: str = file_path
         self.unique_identifier: str = unique_identifier
         self.data_type: "DeclTypes" = data_type
+
+    def checkDecl(self, identifier) -> bool:
+        decl: Declaration | None = self.declarations.getElement(identifier)
+        if decl :
+            return True
+        return False
 
     # Type hint for copy return type: Self for Python 3.11+, else forward reference str
     def copy(self) -> "Typedef":
