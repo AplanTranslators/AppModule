@@ -264,16 +264,8 @@ class Structure(Basic):
             )
             return
 
-        counter_value = self.counters.get(counter_type)
-        if counter_value is None:
-            # Handle case where counter_type might not be found
-            self.logger.warning(
-                f"Warning: Counter type '{counter_type.name}' not found for Structure '{self.identifier}'."
-            )
-            return
-
         self.addProtocol(
-            protocol_identifier=f"{self.identifier}_{counter_value}",
+            protocol_identifier=self.getName(False),
             element_type=self.element_type,  # Use the structure's element type for the protocol
             parametrs=self.parametrs,  # Use the structure's parameters for the protocol
             inside_the_task=self.inside_the_task,
@@ -401,7 +393,7 @@ class StructureArray(BasicArray):
             )
 
         # Check for uniqueness: Prevent adding structures with duplicate identifiers.
-        existing_element = self.getElement(new_element.identifier)
+        existing_element = self.getElement(new_element.getName(False))
         if existing_element is not None:
             # If an element with the same identifier exists, return False and its index.
             return (False, self.getElementIndex(existing_element.identifier))
