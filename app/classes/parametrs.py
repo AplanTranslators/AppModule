@@ -132,22 +132,6 @@ class ParametrArray(BasicArray):
         """
         super().__init__(Parametr)  # Configure BasicArray to hold Parametr objects
 
-    def copy(self) -> "ParametrArray":
-        """
-        Creates a deep copy of the current `ParametrArray` instance.
-        It iterates through all elements and adds a copy of each `Parametr`
-        object to the new array.
-
-        Returns:
-            ParametrArray: A new `ParametrArray` containing copies of all original parameters.
-        """
-        new_array: ParametrArray = ParametrArray()
-        for (
-            element
-        ) in self.getElements():  # Assumes getElements() returns the list of elements
-            new_array.addElement(element.copy())  # Use Parametr's copy method
-        return new_array
-
     def insert(self, index: int, element: Parametr) -> None:
         """
         Inserts a `Parametr` element at a specific index in the array.
@@ -160,7 +144,7 @@ class ParametrArray(BasicArray):
         # It should be a direct call to the list's insert method.
         self.elements.insert(index, element)
 
-    def addElement(self, new_element: Parametr) -> Tuple[bool, int]:
+    def addElement(self, new_element: Parametr) -> Tuple[bool, int | None]:
         """
         Adds a new `Parametr` element to the array.
         It checks if an element with the same identifier already exists
@@ -198,6 +182,31 @@ class ParametrArray(BasicArray):
             raise TypeError(
                 f"Object should be of type {self.element_type.__name__} but you passed an object of type {type(new_element).__name__}. \n Object: {new_element}"
             )
+
+    def getElements(self) -> List[Parametr]:
+        """
+        Returns all elements currently in the array.
+
+        Returns:
+            List[Basic]: A list containing all elements.
+        """
+        return self.elements
+
+    def copy(self) -> "ParametrArray":
+        """
+        Creates a deep copy of the current `ParametrArray` instance.
+        It iterates through all elements and adds a copy of each `Parametr`
+        object to the new array.
+
+        Returns:
+            ParametrArray: A new `ParametrArray` containing copies of all original parameters.
+        """
+        new_array: ParametrArray = ParametrArray()
+        for (
+            element
+        ) in self.getElements():  # Assumes getElements() returns the list of elements
+            new_array.addElement(element.copy())  # Use Parametr's copy method
+        return new_array
 
     def generateParametrNameByIndex(self, index: int) -> str:
         """

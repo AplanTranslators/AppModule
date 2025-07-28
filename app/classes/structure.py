@@ -22,6 +22,7 @@ class Structure(Basic):
         identifier: str,
         source_interval: Tuple[int, int],
         element_type: ElementsTypes = ElementsTypes.NONE_ELEMENT,
+        number: int | None = None,
     ):
         """
         Initializes a new `Structure` instance.
@@ -57,7 +58,10 @@ class Structure(Basic):
 
         # `number` is set from `name_space_level` and can be updated by `setNumber`.
         # It's used for unique naming in `getName`.
-        self.number: int = self.counters.get(self.counters.types.STRUCT_COUNTER)
+        if number:
+            self.number = number
+        else:
+            self.number: int = self.counters.get(self.counters.types.STRUCT_COUNTER)
         self.counters.incriese(self.counters.types.STRUCT_COUNTER)
 
         # `inside_the_task` flag influences how parameters are handled when adding new protocols.
@@ -167,7 +171,7 @@ class Structure(Basic):
                 display_identifier = f"{display_identifier}({str(self.parametrs)})"
         return display_identifier
 
-    def getLastBehaviorIndex(self) -> Optional[Union["Protocol", "Structure"]]:
+    def getLastBehaviorIndex(self) -> int | None:
         """
         Retrieves the last `Protocol` or `Structure` object added to this
         Structure's `behavior` list.

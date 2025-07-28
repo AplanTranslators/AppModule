@@ -350,7 +350,7 @@ class DesignUnit(Basic):
                     main_protocol_body_parts.append("(")
 
             # Append the identifier of the current element
-            main_protocol_body_parts.append(element.identifier)
+            main_protocol_body_parts.append(element.getName())
 
             # Add closing parenthesis for specific transitions:
             # If next element is an assignment OUT_OF_BLOCK and current is a design_unit call/assign

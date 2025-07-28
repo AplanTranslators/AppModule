@@ -140,7 +140,7 @@ class BasicArray:
             element_type (Type[Basic]): The expected type of elements this array will hold.
                                         Defaults to Basic.
         """
-        self.elements: List[Basic] = []
+        self.elements = []
         self.element_type: Type[Basic] = element_type
 
     def __len__(self) -> int:

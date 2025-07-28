@@ -417,3 +417,34 @@ class NodeArray(BasicArray):
             f"\telements={self.elements!r}\n"
             f")"
         )
+
+    def have_common_identifier_elements(self, arr2: "NodeArray") -> bool:
+        """
+        Порівнює два NodeArray і повертає False, якщо вони містять хоча б один однаковий
+        елемент типу ElementsTypes.IDENTIFIER_ELEMENT.
+
+        Args:
+            arr1 (NodeArray): Перший масив Node.
+            arr2 (NodeArray): Другий масив Node.
+
+        Returns:
+            bool: True, якщо немає спільних ElementsTypes.IDENTIFIER_ELEMENT,
+                False, якщо є хоча б один спільний ідентифікатор.
+        """
+        # Збираємо множини ідентифікаторів для кожного масиву
+        identifiers1 = {
+            node.identifier
+            for node in self.elements
+            if node.element_type == ElementsTypes.IDENTIFIER_ELEMENT
+        }
+        identifiers2 = {
+            node.identifier
+            for node in arr2.elements
+            if node.element_type == ElementsTypes.IDENTIFIER_ELEMENT
+        }
+
+        # Перевіряємо, чи є перетин між двома множинами
+        if identifiers1.isdisjoint(identifiers2):
+            return False  # Немає спільних ідентифікаторів
+        else:
+            return True  # Є хоча б один спільний ідентифікатор

@@ -403,7 +403,7 @@ class Protocol(Basic):
         self,
         identifier: str,
         source_interval: Tuple[int, int],
-        element_type: ElementsTypes = ElementsTypes.NONE_ELEMENT,
+        element_type: ElementsTypes | None = ElementsTypes.NONE_ELEMENT,
         parametrs: Optional[
             ParametrArray
         ] = None,  # Made optional, will be initialized in the body
@@ -423,6 +423,8 @@ class Protocol(Basic):
                                                           configuration parameters of this protocol.
                                                           If `None`, an empty `ParametrArray` is created.
         """
+        if element_type == None:
+            element_type = ElementsTypes.NONE_ELEMENT
         super().__init__(identifier, source_interval, element_type)
 
         # `body` stores the sequence of operations/statements within this protocol.
@@ -432,12 +434,6 @@ class Protocol(Basic):
         # Ensure a new instance if None is passed to avoid mutable default argument issues.
         self.parametrs: ParametrArray = (
             parametrs if parametrs is not None else ParametrArray()
-        )
-
-        # `number` attribute is used in `getName`, assuming it's set elsewhere.
-        # It's good practice to initialize it here if it's a common attribute.
-        self.number: Optional[int] = (
-            None  # Placeholder, assume it's assigned later if needed
         )
 
     def copy(self) -> "Protocol":
