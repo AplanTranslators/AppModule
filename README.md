@@ -58,3 +58,18 @@ For this tool you can have the same example file as for the Testing tool or run 
         tool.setType("sv") # Set the regeneration file type
         tool.regeneration_start(path_to_sv = "path to exampe file")
 ```
+
+### Code Quality and Standards
+
+This project uses several tools to enforce code quality and maintain a clean Git history.
+
+- **[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)**: We follow the Conventional Commits specification to standardize commit messages. This helps in understanding the purpose of each commit and allows for automated tools to handle versioning and changelog generation.
+- **[Commitizen](https://commitizen-tools.github.io/commitizen/)**: We use Commitizen to validate commit messages against the Conventional Commits standard.
+- **[Black](https://github.com/psf/black)**: We use Black to automatically format Python code, ensuring a consistent style across the entire project.
+
+To ensure your commits and code adhere to these standards, we highly recommend setting up the Git hooks. You can do this by running the following commands:
+
+```bash
+chmod +x bootstrap.sh 
+./bootstrap.sh
+```
