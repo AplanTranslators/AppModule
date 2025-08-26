@@ -1,5 +1,5 @@
 import pytest
-from app.utils.unsorted import UnsortedUnils
+from ..utils.unsorted import UnsortedUnils
 
 
 @pytest.fixture

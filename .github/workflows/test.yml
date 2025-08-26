@@ -20,8 +20,5 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements_for_testing.txt ]; then pip install -r requirements_for_testing.txt; fi
 
-      - name: Run unit tests
-        run: pytest
-
       - name: Run tests
-        run: pytest
+        run: pytest --log-cli-level=INFO
