@@ -49,7 +49,7 @@ class Typedef(Basic):
 
     def checkDecl(self, identifier) -> bool:
         decl: Declaration | None = self.declarations.getElement(identifier)
-        if decl :
+        if decl:
             return True
         return False
 
@@ -339,6 +339,7 @@ class TypedefArray(BasicArray):
             new_element.source_interval,
         )
         if is_uniq_element is not None:
+            self.logger.warning("It is used!")
             # If a matching element exists, return False and its index.
             return (False, self.getElementIndex(is_uniq_element.identifier))
 
