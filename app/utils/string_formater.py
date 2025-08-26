@@ -176,6 +176,7 @@ class StringFormater(metaclass=SingletonMeta):
                 value_string = "0b" + value_string
             value = literal_eval(value_string)
             return str(value)
+
         expression = re.sub(pattern, lambda match: replace_match(match), expression)
         expression = str(expression)
         expression = expression.replace("'", "")
@@ -260,39 +261,22 @@ class StringFormater(metaclass=SingletonMeta):
         result = re.sub(pattern, "=", expression)
         return result
 
-    def doubleOperators2Aplan(self, expression: str):
-        """The function `doubleOperators2Aplan` takes an input expression as a string and replaces increment
-        and decrement operators with their corresponding assignment operations.
+    def doubleOperators2Aplan(self, expression: str) -> str:
+        """Replaces increment and decrement operators with their assignment equivalents."""
 
-        Parameters
-        ----------
-        expression : str
+        # 1. Заміна '++'
+        def replace_increment(match):
+            variable = match.group(1)
+            return f"{variable} = {variable} + 1"
 
-        Returns
-        -------
-            The `doubleOperators2Aplan` function takes an input expression as a string and looks for patterns
-        of increment (++) and decrement (--) operators applied to variables. It then replaces these patterns
-        with the corresponding increment or decrement assignment statements. The modified expression is
-        returned as the result.
+        result = re.sub(r"(\w+)\s*\+\+", replace_increment, expression)
 
-        """
-        patterns = [r"(\w+)(\+\+)", r"(\w+)(--)"]
-        pattern = "|".join(patterns)
+        # 2. Заміна '--'
+        def replace_decrement(match):
+            variable = match.group(1)
+            return f"{variable} = {variable} - 1"
 
-        def replace_match(match):
-            for i in range(len(patterns)):
-                if match.group(i) is not None:
-                    if i == 0:
-                        value = f"{match.group(i+1)} = {match.group(i+1)} + 1"
-                    elif i == 1:
-                        value = f"{match.group(i+1)} = {match.group(i+1)} - 1"
-                    else:
-                        self.logger.warning(f"Unhandled case {match}")
-                    return value
-
-            return value
-
-        result = re.sub(pattern, lambda match: replace_match(match), expression)
+        result = re.sub(r"(\w+)\s*\-\-", replace_decrement, result)
 
         return result
 
@@ -377,61 +361,55 @@ class StringFormater(metaclass=SingletonMeta):
         return expression
 
     def generatePythonStyleTernary(self, expression: str):
-        """The function `generatePythonStyleTernary` converts a ternary expression in a specific format to
-        Python ternary operator format.
-
-        Parameters
-        ----------
-        expression : str
-
-        Returns
-        -------
-            The `generatePythonStyleTernary` function returns a Python-style ternary expression based on the
-        input expression provided. If the input expression matches the ternary pattern, it converts it into
-        a Python ternary expression format and returns it. Otherwise, it returns the original input
-        expression.
-
-        """
         pattern = (
             r"\((?P<condition>.+)\)\s*\?\s*(?P<true_value>.+)\s*:\s*(?P<false_value>.+)"
         )
         match = re.match(pattern, expression)
 
         if match:
-            condition = match.group("condition")
-            true_value = match.group("true_value")
-            false_value = match.group("false_value")
+            condition = match.group("condition").strip()
+            true_value = match.group("true_value").strip()
+            false_value = match.group("false_value").strip()
             expression = f"({true_value} if {condition} else {false_value})"
             return expression
         else:
             return expression
 
     def replace_cpp_operators(self, expression: str) -> str:
-        """The function `replace_cpp_operators` converts C++ logical and arithmetic operators to their Python
-        equivalents in a given expression.
-
-        Parameters
-        ----------
-        expression : str
-
-        Returns
-        -------
-            The function `replace_cpp_operators` takes a string `expression` as input and replaces C++
-        operators with their Python equivalents using regular expressions. The function then returns the
-        modified expression with C++ operators replaced by Python operators.
-
         """
+        Converts C++ logical and arithmetic operators to their Python equivalents,
+        handling spaces and increment/decrement operators.
+        """
+        # 1. Заміна інкрементних/декрементних операторів
+        # Це необхідно зробити першими, щоб уникнути конфліктів з іншими замінами
+
+        # Заміна '++' на '+= 1'
+        expression = re.sub(r"(\w+)\s*\+\+", r"\1 += 1", expression)
+
+        # Заміна '--' на '-= 1'
+        expression = re.sub(r"(\w+)\s*--", r"\1 -= 1", expression)
+
+        # 2. Заміна логічних операторів з урахуванням пробілів
+        # Використовуємо захоплення груп для збереження пробілів
         replacements = {
-            r"&&": " and ",
-            r"\|\|": " or ",
-            r"!": " not ",
-            r"(?<!/)/(?!/)": " // ",
-            r"\btrue\b": " True ",
-            r"\bfalse\b": " False ",
-            r"\+\+": " += 1",
+            # Заміна && на 'and'
+            r"(\s*)\&\&(\s*)": r" and ",
+            # Заміна || на 'or'
+            r"(\s*)\|\|(\s*)": r" or ",
+            # Заміна / на '//'
+            r"(\s*)/(\s*)": r" // ",
+            # Заміна / на '//'
+            r"(\s*)!(\s*)": r" not ",
         }
 
-        for cpp_op, py_op in replacements.items():
-            expression = re.sub(cpp_op, py_op, expression)
+        for pattern, replacement in replacements.items():
+            expression = re.sub(pattern, replacement, expression)
+
+        # 3. Заміна оператора '!' на 'not'
+        # Додаємо пробіл після 'not'
+        # expression = re.sub(r"!", " not ", expression)
+
+        # 4. Заміна булевих значень
+        expression = expression.replace("true", "True").replace("false", "False")
 
         return expression

@@ -119,6 +119,7 @@ def test_doubleOperators2Aplan(sf):
     Test doubleOperators2Aplan method.
     Ensure it converts double operators like "++" and "--" to their corresponding assignment operations.
     """
+    print(sf.doubleOperators2Aplan("x++"))
     assert sf.doubleOperators2Aplan("x++") == "x = x + 1"
     assert sf.doubleOperators2Aplan("x--") == "x = x - 1"
     assert sf.doubleOperators2Aplan("c++; d--") == "c = c + 1; d = d - 1"
@@ -180,6 +181,7 @@ def test_replace_cpp_operators(sf):
     """
     expr = "a && b || !c / d ++ true false"
     out = sf.replace_cpp_operators(expr)
+
     # Check replacements individually
     assert "and" in out
     assert "or" in out
@@ -189,7 +191,8 @@ def test_replace_cpp_operators(sf):
     assert "True" in out
     assert "False" in out
     assert sf.replace_cpp_operators("x / y") == "x // y"
-    assert sf.replace_cpp_operators("true && false") == " True  and  False "
+    assert sf.replace_cpp_operators("true && false") == "True and False"
     assert sf.replace_cpp_operators("x++") == "x += 1"
-    assert sf.replace_cpp_operators("x && y || !z") == "x  and  y  or  not  z"
+    
+    assert sf.replace_cpp_operators("x&&y||!z") == "x and y or not z"
     assert sf.replace_cpp_operators("") == ""
