@@ -1,5 +1,5 @@
 import pytest
-from app.utils.unsorted import UnsortedUnils
+from ..utils.unsorted import UnsortedUnils
 
 
 @pytest.fixture
@@ -30,8 +30,8 @@ def test_is_interval_contained_false(uu):
 # ---------------------------
 def test_isNumericString_valid(uu):
     """
-    Test if the string is a valid numeric string.  
-    String with only digits should return the same string.     
+    Test if the string is a valid numeric string.
+    String with only digits should return the same string.
     """
     assert uu.isNumericString("12345") == "12345"
 
@@ -106,7 +106,7 @@ def test_extractFunctionName(uu, expression, expected):
 # Tests for vectorSize2AplanVectorSize
 # ---------------------------
 def test_vectorSize2AplanVectorSize_normal(uu):
-    """ 
+    """
     Test that the vectorSize2AplanVectorSize function correctly calculates the vector size.
     It shouldNormal case: left=8, right=4 → result [4, 4].
     """
@@ -122,7 +122,7 @@ def test_vectorSize2AplanVectorSize_right_zero(uu):
 
 
 def test_vectorSize2AplanVectorSize_raises(uu):
-    """ 
+    """
     Test that the vectorSize2AplanVectorSize function raises ValueError for None inputs.
     """
     with pytest.raises(ValueError):
@@ -133,14 +133,14 @@ def test_vectorSize2AplanVectorSize_raises(uu):
 # Tests for extractVectorSize
 # ---------------------------
 def test_evaluateExpression_basic(uu):
-    """ 
+    """
     Test that the evaluateExpression function evaluates a basic arithmetic expression.
     """
     assert uu.evaluateExpression("2+3*4") == 14
 
 
 def test_evaluateExpression_with_variables(uu):
-    """ 
+    """
     Test that the evaluateExpression function evaluates an expression with variables.
     Expressions with variables should use provided mapping.
     """

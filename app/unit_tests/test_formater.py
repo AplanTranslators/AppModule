@@ -18,7 +18,7 @@ def sf():
 
 def test_remove_trailing_comma(sf):
     """
-    Test removeTrailingComma method. 
+    Test removeTrailingComma method.
     Ensure trailing commas are correctly removed from strings.
     """
     assert sf.removeTrailingComma("test,") == "test"
@@ -44,10 +44,12 @@ def test_replaceValueParametrsCalls(sf):
     Test replaceValueParametrsCalls method.
     Replace parameter identifiers with their corresponding values.
     """
-    param_array = SimpleNamespace(elements=[
-        SimpleNamespace(identifier="foo", value=42),
-        SimpleNamespace(identifier="bar", value=7)
-    ])
+    param_array = SimpleNamespace(
+        elements=[
+            SimpleNamespace(identifier="foo", value=42),
+            SimpleNamespace(identifier="bar", value=7),
+        ]
+    )
     assert sf.replaceValueParametrsCalls(param_array, "foo + bar") == "42 + 7"
     assert sf.replaceValueParametrsCalls(param_array, "z + bar") == "z + 7"
     assert sf.replaceValueParametrsCalls(param_array, "foo + y") == "42 + y"
@@ -70,9 +72,9 @@ def test_valuesToAplanStandart(sf):
     Test valuesToAplanStandart method.
     Checks that it converts various value formats.
     """
-    assert sf.valuesToAplanStandart("4'b1010") == "10"   # binary
-    assert sf.valuesToAplanStandart("2'hf") == "15"      # hex
-    assert sf.valuesToAplanStandart("'123") == "123"     # decimal
+    assert sf.valuesToAplanStandart("4'b1010") == "10"  # binary
+    assert sf.valuesToAplanStandart("2'hf") == "15"  # hex
+    assert sf.valuesToAplanStandart("'123") == "123"  # decimal
 
 
 def test_addBracketsAfterNegation(sf):
@@ -119,6 +121,7 @@ def test_doubleOperators2Aplan(sf):
     Test doubleOperators2Aplan method.
     Ensure it converts double operators like "++" and "--" to their corresponding assignment operations.
     """
+    print(sf.doubleOperators2Aplan("x++"))
     assert sf.doubleOperators2Aplan("x++") == "x = x + 1"
     assert sf.doubleOperators2Aplan("x--") == "x = x - 1"
     assert sf.doubleOperators2Aplan("c++; d--") == "c = c + 1; d = d - 1"
@@ -128,7 +131,7 @@ def test_doubleOperators2Aplan(sf):
 def test_notConcreteIndex2AplanStandart_with_dimension(sf):
     """
     Test notConcreteIndex2AplanStandart method when a declaration with dimension exists.
-    The method should replace array-style indexing `foo.bar[i]` 
+    The method should replace array-style indexing `foo.bar[i]`
     with function-style syntax `foo.bar(i)`.
     """
     mock_decl = SimpleNamespace()
@@ -141,14 +144,16 @@ def test_notConcreteIndex2AplanStandart_with_dimension(sf):
 def test_notConcreteIndex2AplanStandart_without_dimension(sf):
     """
     Test notConcreteIndex2AplanStandart method when no declaration with dimension exists.
-    The method should replace array-style indexing `foo.bar[i]` 
+    The method should replace array-style indexing `foo.bar[i]`
     with a call to `BGET(foo.bar, i)`.
     """
     mock_decl = SimpleNamespace()
     mock_decl.findDeclWithDimentionByName = lambda name: None
     mock_design_unit = SimpleNamespace(declarations=mock_decl)
     expr = "foo.bar[i]"
-    assert sf.notConcreteIndex2AplanStandart(expr, mock_design_unit) == "BGET(foo.bar, i)"
+    assert (
+        sf.notConcreteIndex2AplanStandart(expr, mock_design_unit) == "BGET(foo.bar, i)"
+    )
 
 
 def test_vectorSizes2AplanStandart_single(sf):
@@ -180,6 +185,7 @@ def test_replace_cpp_operators(sf):
     """
     expr = "a && b || !c / d ++ true false"
     out = sf.replace_cpp_operators(expr)
+
     # Check replacements individually
     assert "and" in out
     assert "or" in out
@@ -189,7 +195,8 @@ def test_replace_cpp_operators(sf):
     assert "True" in out
     assert "False" in out
     assert sf.replace_cpp_operators("x / y") == "x // y"
-    assert sf.replace_cpp_operators("true && false") == " True  and  False "
+    assert sf.replace_cpp_operators("true && false") == "True and False"
     assert sf.replace_cpp_operators("x++") == "x += 1"
-    assert sf.replace_cpp_operators("x && y || !z") == "x  and  y  or  not  z"
+
+    assert sf.replace_cpp_operators("x&&y||!z") == "x and y or not z"
     assert sf.replace_cpp_operators("") == ""

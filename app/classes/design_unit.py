@@ -23,9 +23,9 @@ class DesignUnit(Basic):
 
     def __init__(
         self,
-        identifier: str,
-        source_interval: Tuple[int, int],
-        ident_uniq_name: str,  # Changed type hint from Any to str
+        identifier: str = "placeholder",
+        source_interval: Tuple[int, int] = (0, 0),
+        ident_uniq_name: str = "placeholder",  # Changed type hint from Any to str
         element_type: "ElementsTypes" = ElementsTypes.MODULE_ELEMENT,
     ):
         """
@@ -72,6 +72,24 @@ class DesignUnit(Basic):
         self.packages_and_objects: "DesignUnitArray" = (
             DesignUnitArray()
         )  # For nested design_units or class instances
+
+    def setSourceInterval(self, source_interval: Tuple[int, int]):
+        self.source_interval = source_interval
+
+    def setIdentifier(self, new_identifier: str, new_ident_uniq_name: str):
+        """
+        Updates the identifier and unique identifier of the DesignUnit.
+
+        Args:
+            new_identifier (str): The new common name for the design unit.
+            new_ident_uniq_name (str): The new unique identifier for the design unit.
+        """
+        self.identifier = new_identifier.upper()
+        self.ident_uniq_name = new_ident_uniq_name
+
+        # Оновлюємо кешовані версії
+        self.identifier_upper = self.identifier
+        self.ident_uniq_name_upper = self.ident_uniq_name.upper()
 
     # Type hint for copy return type: Self for Python 3.11+, else forward reference str
     def copyPart(self) -> "DesignUnit":

@@ -711,32 +711,6 @@ class DeclarationArray(BasicArray):
 
         return result_array
 
-    def findElementWithSource(
-        self,
-        identifier: str,
-        source_interval: Tuple[int, int],
-    ) -> Optional[Declaration]:
-        """
-        Finds a `Declaration` element that matches either the given identifier
-        or the source interval.
-
-        Args:
-            identifier (str): The identifier (name) of the declaration to search for.
-            source_interval (Tuple[int, int]): The source interval of the declaration
-                                                to search for.
-
-        Returns:
-            Optional[Declaration]: The first `Declaration` object found that matches
-                                   either criteria, or `None` if no match is found.
-        """
-        for element in self.elements:
-            if (
-                element.identifier == identifier
-                or element.source_interval == source_interval
-            ):
-                return element
-        return None
-
     # Note: This `addElement` method overrides the one inherited from BasicArray.
     # It includes custom uniqueness logic and sorting.
     def addElement(self, new_element: Declaration) -> Tuple[bool, Optional[int]]:
