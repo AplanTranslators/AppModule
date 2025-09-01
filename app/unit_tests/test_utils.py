@@ -31,19 +31,36 @@ def test_singleton_meta_behavior():
 # --------------------------
 # TimeUtils tests
 # --------------------------
-def test_format_time_m_s():
-    """
-    Test that format_time_m_s correctly formats seconds into 'm s' format.
-    Should handle various cases including zero, single minute, and large values
-    """
-    # Create an instance of TimeUtils
-    tu = TimeUtils()
-    assert tu.format_time_m_s(75) == "1 m 15 s"
-    assert tu.format_time_m_s(59) == "59 s"
-    assert tu.format_time_m_s(120) == "2 m 0 s"
-    assert tu.format_time_m_s(3599) == "59 m 59 s"
-    assert tu.format_time_m_s(3600) == "60 m 0 s", "Large value should handle hours"
-    assert tu.format_time_m_s(0) == "0 s", "Zero should be '0 s'"
+@pytest.fixture
+def time_utils():
+    """Provides a fresh instance of TimeUtils for each test."""
+    return TimeUtils()
+
+# --- Tests for format_time_m_s ---
+def test_format_time_m_s_normal_case(time_utils):
+    """Test formatting for a time with both minutes and seconds."""
+    assert time_utils.format_time_m_s(75) == "1 m 15 s"
+
+def test_format_time_m_s_less_than_minute(time_utils):
+    """Test formatting for a time less than one minute."""
+    assert time_utils.format_time_m_s(59) == "59 s"
+
+def test_format_time_m_s_exact_minutes(time_utils):
+    """Test formatting for a time that's an exact multiple of a minute."""
+    assert time_utils.format_time_m_s(120) == "2 m 0 s"
+
+def test_format_time_m_s_large_value(time_utils):
+    """Test formatting for a large time value."""
+    assert time_utils.format_time_m_s(3599) == "59 m 59 s"
+    assert time_utils.format_time_m_s(3600) == "60 m 0 s"
+
+def test_format_time_m_s_zero(time_utils):
+    """Test formatting for zero seconds."""
+    assert time_utils.format_time_m_s(0) == "0 s"
+
+# --------------------------
+# Tests for format_time_date_h_m_s
+# --------------------------
 
 def test_format_time_date_h_m_s(mocker):
     """
@@ -79,11 +96,12 @@ def counters():
     c.reinit()
     return c
 
-def test_counters_initial_values(counters):
-    """
-    Test that the counters are initialized with the correct default values.
-    """
+def test_counters_initial_assignment_counter(counters):
+    """Test that the assignment counter is initialized to 1."""
     assert counters.get(CounterTypes.ASSIGNMENT_COUNTER) == 1
+
+def test_counters_initial_case_counter(counters):
+    """Test that the case counter is initialized to 0."""
     assert counters.get(CounterTypes.CASE_COUNTER) == 0
 
 def test_incriese(counters):
