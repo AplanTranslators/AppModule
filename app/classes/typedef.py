@@ -136,6 +136,26 @@ class Typedef(Basic):
             f")"
         )
 
+    def replaceTokensWithExpressions(self, tokens):
+        # Створюємо словник для швидкого пошуку ідентифікаторів
+        # Замість перебирання списку на кожному кроці.
+        element_map = {
+            el.identifier: el.expression for el in self.declarations.getElements()
+        }
+
+        result_tokens = []
+        for token in tokens:
+            # Перевіряємо, чи є токен ідентифікатором у нашому словнику
+            if token in element_map:
+                # Якщо так, додаємо його .expression до списку результатів
+                result_tokens.append(str(element_map[token]))
+            else:
+                # Якщо ні, додаємо токен як є
+                result_tokens.append(token)
+
+        # Об'єднуємо токени назад у рядок
+        return result_tokens
+
 
 class TypedefArray(BasicArray):
     """

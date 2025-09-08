@@ -15,6 +15,30 @@ class StringFormater(metaclass=SingletonMeta):
     def __init__(self):
         pass
 
+    # NEED UNIT TESTS
+    def tokenizeExpression(self, expression):
+        """
+        Splits an expression string into tokens: identifiers, numbers, and other characters.
+
+         Args:
+             expression (str): SystemVerilog expression string.
+
+         Returns:
+             list: List of tokens.
+        """
+        # Regex pattern to search for IDs, numbers, or any other character.
+        # r'(\b[a-zA-Z_][a-zA-Z0-9_]*\b|\b\d+\b|.)'
+        # 1. \b[a-zA-Z_][a-zA-Z0-9_]*\b - searches for identifiers (words that do not start with a number)
+        # 2. \b\d+\b - looking for numbers
+        # 3. . - searches for any other character
+        pattern = r"(\b[a-zA-Z_][a-zA-Z0-9_]*\b|\b\d+\b|.)"
+
+        # re.findall() returns a list of all match groups found.
+        # filter(None, ...) removes any blank lines that may appear.
+        tokens = [t for t in re.findall(pattern, expression) if t.strip()]
+
+        return tokens
+
     def removeTrailingComma(self, s: str) -> str:
         """The function `removeTrailingComma` takes a string as input and removes any trailing commas from the
         end of the string.
