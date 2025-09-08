@@ -593,6 +593,9 @@ class DeclarationArray(BasicArray):
         """
         super().__init__(Declaration)
 
+    def getElement(self, identifier) -> List[Declaration]:
+        return super().getElement(identifier)
+
     def copy(self) -> "DeclarationArray":
         """
         Creates a deep copy of the current `DeclarationArray` instance.
