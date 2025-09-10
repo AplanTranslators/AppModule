@@ -1,5 +1,5 @@
 import time
-from ..utils.singleton import SingletonMeta
+from ..singleton.singleton import SingletonMeta
 
 
 class TimeUtils(metaclass=SingletonMeta):
@@ -17,6 +17,6 @@ class TimeUtils(metaclass=SingletonMeta):
 
     def format_time_date_h_m_s(self, input_time):
         return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(input_time))
-    
+
     def format_time_h_m_s(self, input_time):
         return time.strftime("%H:%M:%S", time.localtime(input_time))

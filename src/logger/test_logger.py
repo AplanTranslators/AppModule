@@ -1,21 +1,16 @@
 import logging
 import pytest
-import sys
-import os
 from io import StringIO
-
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from ..utils.logger import Logger
+from ..logger.logger import Logger, LoggerManager
 
 
 # --------------------------
 # Logger tests
 # --------------------------
 @pytest.fixture
-def logger_instance():
-    logger = Logger()
-    logger.activate()  # ensure active before each test
+def logger_instance() -> Logger:
+    logger: Logger = LoggerManager().getLogger("LoggerTest")
+    # logger.activate()  # ensure active before each test
     return logger
 
 
@@ -32,6 +27,7 @@ def log_capture(logger_instance, monkeypatch):
     yield stream
     logger_instance.logger.removeHandler(handler)
 
+
 @pytest.mark.parametrize("method", ["debug", "info", "warning", "error", "critical"])
 def test_logger_methods_write_output(logger_instance, log_capture, method):
     """
@@ -40,6 +36,7 @@ def test_logger_methods_write_output(logger_instance, log_capture, method):
     getattr(logger_instance, method)("Test message")
     output = log_capture.getvalue()
     assert "Test message" in output
+
 
 def test_logger_activate_deactivate(logger_instance, log_capture):
     """
@@ -52,6 +49,7 @@ def test_logger_activate_deactivate(logger_instance, log_capture):
     logger_instance.activate()
     logger_instance.info("Should appear")
     assert "Should appear" in log_capture.getvalue()
+
 
 def test_logger_activate_deactivate_cycle(logger_instance, log_capture):
     """

@@ -1,7 +1,8 @@
-# App-Module
+# Core Translator
 
+## Version 1.0.0 Unstable
 
-This is an application design_unit, it includes tools and basic structures for generating Aplan Files.
+This is an application includes tools and basic structures for generating Aplan Files.
 
 It provides tools such as:
     - TranlatorTool - A basic tool that performs translation of a specified file (SV or VHDL) depending on the provided translator.
@@ -70,6 +71,6 @@ This project uses several tools to enforce code quality and maintain a clean Git
 To ensure your commits and code adhere to these standards, we highly recommend setting up the Git hooks. You can do this by running the following commands:
 
 ```bash
-chmod +x bootstrap.sh 
-./bootstrap.sh
+chmod +x scripts/bootstrap.sh 
+./scripts/bootstrap.sh
 ```

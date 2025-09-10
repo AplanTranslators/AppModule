@@ -1,12 +1,11 @@
 import difflib
 import json
 import shutil
-import sys
 import os
 from typing import Dict, List
 
-from ..utils.logger import Logger
-from ..utils.singleton import SingletonMeta
+from ..logger.logger import Logger, LoggerManager
+from ..singleton.singleton import SingletonMeta
 
 import glob
 
@@ -14,7 +13,8 @@ ExampleEntry = Dict[str, str]
 
 
 class FilesMngr(metaclass=SingletonMeta):
-    logger = Logger()
+    def __init__(self):
+        self.logger: Logger = LoggerManager().getLogger(self.__class__.__qualname__)
 
     def is_pass_exist(self, path: str):
         if not os.path.exists(path):

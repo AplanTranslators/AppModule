@@ -1,7 +1,8 @@
 from typing import Optional, Tuple
 from ..classes.element_types import ElementsTypes
 from ..classes.structure import Structure
-#from antlr4_verilog.systemverilog import SystemVerilogParser
+
+# from antlr4_verilog.systemverilog import SystemVerilogParser
 
 
 class CaseStmt(Structure):

@@ -1,12 +1,14 @@
 import hashlib
 import re
 import string
-from ..utils.logger import Logger
-from ..utils.singleton import SingletonMeta
+from ..logger.logger import Logger, LoggerManager
+from ..singleton.singleton import SingletonMeta
 
 
 class UnsortedUnils(metaclass=SingletonMeta):
-    logger = Logger()
+
+    def __init__(self):
+        self.logger: Logger = LoggerManager().getLogger(self.__class__.__qualname__)
 
     def is_interval_contained(self, interval1, interval2):
         start1, end1 = interval1

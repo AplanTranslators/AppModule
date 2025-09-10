@@ -2,7 +2,7 @@ import copy
 from typing import Any, List, Tuple, Type
 from ..classes.element_types import ElementsTypes
 from ..utils.counters import Counters
-from ..utils.logger import Logger
+from ..logger.logger import Logger, LoggerManager
 from ..utils.string_formater import StringFormater
 from ..utils.unsorted import UnsortedUnils
 
@@ -18,7 +18,6 @@ class Basic:
     # These are assumed to be singletons or stateless helpers
     # that all instances of Basic (and its subclasses) can share.
     counters = Counters()
-    logger = Logger()
     utils = UnsortedUnils()
     string_formater = StringFormater()
 
@@ -46,6 +45,7 @@ class Basic:
         self.number: int | None = (
             None  # Optional numerical suffix, e.g., for unique naming in context.
         )
+        self.logger: Logger = LoggerManager().getLogger(self.__class__.__qualname__)
 
     def copy(self) -> "Basic":
         """
@@ -128,7 +128,6 @@ class BasicArray:
     # Class-level instances for utility functions and logging.
     # These are initialized once and shared across all BasicArray instances.
     counters = Counters()
-    logger = Logger()
     utils = UnsortedUnils()
     string_formater = StringFormater()
 
@@ -142,6 +141,7 @@ class BasicArray:
         """
         self.elements = []
         self.element_type: Type[Basic] = element_type
+        self.logger: Logger = LoggerManager().getLogger(self.__class__.__qualname__)
 
     def __len__(self) -> int:
         """

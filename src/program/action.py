@@ -11,7 +11,9 @@ def create_Action_File(self: "Program"):
     # ----------------------------------
     actions = ""
     for index, design_unit in enumerate(
-        self.design_units.getElementsIE(exclude=ElementsTypes.OBJECT_ELEMENT).getElements()
+        self.design_units.getElementsIE(
+            exclude=ElementsTypes.OBJECT_ELEMENT
+        ).getElements()
     ):
         result = design_unit.actions.getActionsInStrFormat()
         if index != 0:

@@ -5,9 +5,10 @@ import os
 import pytest
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from ..utils.singleton import SingletonMeta
+from ..singleton.singleton import SingletonMeta
 from ..utils.time import TimeUtils
 from ..utils.counters import Counters, CounterTypes
+
 
 # --------------------------
 # SingletonMeta tests
@@ -45,6 +46,7 @@ def test_format_time_m_s():
     assert tu.format_time_m_s(3600) == "60 m 0 s", "Large value should handle hours"
     assert tu.format_time_m_s(0) == "0 s", "Zero should be '0 s'"
 
+
 def test_format_time_date_h_m_s(mocker):
     """
     Test that format_time_date_h_m_s correctly formats a timestamp into 'YYYY-MM-DD HH:MM:SS' format.
@@ -52,12 +54,13 @@ def test_format_time_date_h_m_s(mocker):
     """
     tu = TimeUtils()
     ts = 1672531200  # 2023-01-01 00:00:00 UTC
-    mocker.patch('time.localtime', return_value=pytime.gmtime(ts))
+    mocker.patch("time.localtime", return_value=pytime.gmtime(ts))
     formatted = tu.format_time_date_h_m_s(ts)
     assert len(formatted) == 19
     assert formatted.count(":") == 2
     assert formatted.count("-") == 2
     assert formatted == "2023-01-01 00:00:00", "Should format to 'YYYY-MM-DD HH:MM:SS'"
+
 
 def test_format_time_h_m_s():
     """
@@ -70,6 +73,7 @@ def test_format_time_h_m_s():
     assert len(formatted) == 8
     assert formatted.count(":") == 2
 
+
 # --------------------------
 # Counters tests
 # --------------------------
@@ -79,12 +83,14 @@ def counters():
     c.reinit()
     return c
 
+
 def test_counters_initial_values(counters):
     """
     Test that the counters are initialized with the correct default values.
     """
     assert counters.get(CounterTypes.ASSIGNMENT_COUNTER) == 1
     assert counters.get(CounterTypes.CASE_COUNTER) == 0
+
 
 def test_incriese(counters):
     """
@@ -93,6 +99,7 @@ def test_incriese(counters):
     initial = counters.get(CounterTypes.ASSIGNMENT_COUNTER)
     counters.incriese(CounterTypes.ASSIGNMENT_COUNTER)
     assert counters.get(CounterTypes.ASSIGNMENT_COUNTER) == initial + 1
+
 
 def test_decriese(counters):
     """
@@ -103,35 +110,42 @@ def test_decriese(counters):
     counters.decriese(CounterTypes.CASE_COUNTER)
     assert counters.get(CounterTypes.CASE_COUNTER) == initial - 1
 
+
 def test_decriese_not_below_zero(counters):
     """
     Test that the decriese method does not decrement a counter below 0.
     """
     counters.decriese(CounterTypes.CASE_COUNTER)  # already at 0
     assert counters.get(CounterTypes.CASE_COUNTER) == 0
-    
+
+
 def test_get_invalid_counter_type(counters):
     """
     Test that the get method raises ValueError for an unhandled counter type.
     """
     with pytest.raises(ValueError):
-        counters.get(CounterTypes.SEQUENCE_COUNTER)  # initially present but test removal
+        counters.get(
+            CounterTypes.SEQUENCE_COUNTER
+        )  # initially present but test removal
         counters.counters.pop(CounterTypes.SEQUENCE_COUNTER.value)
         counters.get(CounterTypes.SEQUENCE_COUNTER)
+
 
 def test_get_invalid_counter_type(counters):
     with pytest.raises(ValueError, match="Unhandled counter type: NONE_COUNTER"):
         counters.get(CounterTypes.NONE_COUNTER)
 
+
 def test_incriese_invalid_type(counters):
-    """ Test that incriese raises ValueError for an unhandled counter type.
-    """
+    """Test that incriese raises ValueError for an unhandled counter type."""
+
     class FakeEnum:
         value = 9999
         name = "FAKE"
 
     with pytest.raises(ValueError):
         counters.incriese(FakeEnum)
+
 
 def test_deinit_resets_values(counters):
     """
