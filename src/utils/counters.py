@@ -48,7 +48,6 @@ class Counters(metaclass=SingletonMeta):
         self.counters[self.types.OBJECT_COUNTER.value] = 1
         self.counters[self.types.SEQUENCE_COUNTER.value] = 0
         self.counters[self.types.DECL_COUNTER.value] = 0
-        
 
     def unhandled_cb(self, counter_type: CounterTypes):
         raise ValueError(f"Unhandled counter type: {counter_type.name}")

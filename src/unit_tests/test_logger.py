@@ -32,6 +32,7 @@ def log_capture(logger_instance, monkeypatch):
     yield stream
     logger_instance.logger.removeHandler(handler)
 
+
 @pytest.mark.parametrize("method", ["debug", "info", "warning", "error", "critical"])
 def test_logger_methods_write_output(logger_instance, log_capture, method):
     """
@@ -40,6 +41,7 @@ def test_logger_methods_write_output(logger_instance, log_capture, method):
     getattr(logger_instance, method)("Test message")
     output = log_capture.getvalue()
     assert "Test message" in output
+
 
 def test_logger_activate_deactivate(logger_instance, log_capture):
     """
@@ -52,6 +54,7 @@ def test_logger_activate_deactivate(logger_instance, log_capture):
     logger_instance.activate()
     logger_instance.info("Should appear")
     assert "Should appear" in log_capture.getvalue()
+
 
 def test_logger_activate_deactivate_cycle(logger_instance, log_capture):
     """

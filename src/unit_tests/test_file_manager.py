@@ -44,7 +44,7 @@ class TestIsTestingFile:
         assert file_manager.is_testing_file(str(test_file), "py") is True
 
     def test_incorrect_extension(self, file_manager, tmp_path):
-        """ 
+        """
         Test that is_testing_file raises ValueError for a file with an incorrect extension.
         """
         test_file = tmp_path / "test.txt"
@@ -53,7 +53,7 @@ class TestIsTestingFile:
             file_manager.is_testing_file(str(test_file), "py")
 
     def test_path_is_directory(self, file_manager, tmp_path):
-        """ 
+        """
         Should raise ValueError when the path is a directory instead of a file
         """
         with pytest.raises(ValueError, match="is not a .py file"):
@@ -65,8 +65,8 @@ class TestIsTestingFile:
 # ---------------------------
 class TestCompare:
     def test_identical_files(self, file_manager, tmp_path):
-        """ 
-        Test that compare returns no differences for identical files. 
+        """
+        Test that compare returns no differences for identical files.
         Identical files should return an empty diff
         """
         f1 = tmp_path / "a.txt"
@@ -87,9 +87,10 @@ class TestCompare:
         diff = file_manager.compare(str(f1), str(f2))
         assert any("line1" in d or "line2" in d for d in diff)
 
+
 class TestCompareEdgeCases:
     def test_empty_files(self, file_manager, tmp_path):
-        """ 
+        """
         Test that compare returns no differences for empty files.
         Empty files should return an empty diff"""
         f1 = tmp_path / "a.txt"
@@ -99,7 +100,7 @@ class TestCompareEdgeCases:
         assert file_manager.compare(str(f1), str(f2)) == []
 
     def test_one_file_missing(self, file_manager, tmp_path):
-        """ 
+        """
         Test that compare raises FileNotFoundError if one file is missing.
         If one file is missing, it should raise an error
         """
@@ -130,11 +131,10 @@ class TestCompareAplanByPathes:
         assert result is False
         assert "are the same" in caplog.text
 
-
     def test_different_files(self, file_manager, tmp_path, caplog):
         """
         Test that compareAplanByPathes logs differences for files with different content.
-        Different files in directories should return True (differences found)  
+        Different files in directories should return True (differences found)
         """
         dir1 = tmp_path / "dir1"
         dir2 = tmp_path / "dir2"
@@ -164,7 +164,7 @@ class TestRemoveDirectory:
         assert "has been removed" in caplog.text
 
     def test_missing_directory(self, file_manager, tmp_path, caplog):
-        """ 
+        """
         Test that remove_directory does nothing for a non-existing directory.
         If the directory does not exist, it should log a warning
         """
@@ -173,7 +173,7 @@ class TestRemoveDirectory:
         assert "does not exist" in caplog.text
 
     def test_path_is_file(self, file_manager, tmp_path, caplog):
-        """ 
+        """
         Test that remove_directory raises an error if the path is a file.
         If the path is a file, it should log a warning and not delete anything
         """
@@ -245,7 +245,12 @@ class TestLoadExamplesFromJson:
         f = tmp_path / "not_dicts.json"
         f.write_text(json.dumps(["a", "b", "c"]))
         result = file_manager.load_examples_from_json(str(f))
-        assert result == ["a", "b", "c"]  # should pass, since only type(list) is checked
+        assert result == [
+            "a",
+            "b",
+            "c",
+        ]  # should pass, since only type(list) is checked
+
 
 # ---------------------------
 # Tests for replace_filename
