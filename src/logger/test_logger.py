@@ -1,12 +1,7 @@
 import logging
 import pytest
-import sys
-import os
 from io import StringIO
-
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from logger import Logger, LoggerManager
+from ..logger.logger import Logger, LoggerManager
 
 
 # --------------------------
