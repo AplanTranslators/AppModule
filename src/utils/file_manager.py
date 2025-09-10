@@ -14,8 +14,7 @@ ExampleEntry = Dict[str, str]
 
 class FilesMngr(metaclass=SingletonMeta):
     def __init__(self):
-        logger_manager = LoggerManager()
-        self.logger: Logger = logger_manager.getLogger(self.__class__.__qualname__)
+        self.logger: Logger = LoggerManager().getLogger(self.__class__.__qualname__)
 
     def is_pass_exist(self, path: str):
         if not os.path.exists(path):

@@ -12,8 +12,7 @@ if TYPE_CHECKING:
 class StringFormater(metaclass=SingletonMeta):
 
     def __init__(self):
-        logger_manager = LoggerManager()
-        self.logger: Logger = logger_manager.getLogger(self.__class__.__qualname__)
+        self.logger: Logger = LoggerManager().getLogger(self.__class__.__qualname__)
 
     # NEED UNIT TESTS
     def tokenizeExpression(self, expression):

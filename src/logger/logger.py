@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, Literal, Optional
 import logging
 from ..singleton.singleton import SingletonMeta
@@ -93,25 +94,43 @@ LOG_COLORS = Literal[
 ]
 
 
-class LogFileHandler(logging.FileHandler):
+class LogAplanFileHandler(logging.FileHandler):
     """
-    Кастомний обробник для логів, який записує їх у файл
-    з динамічним іменем, що включає часову мітку.
+    A custom handler for logs that writes them to a .act file
     """
 
-    def __init__(self, name: str, level: int = logging.NOTSET) -> None:
-        # Генеруємо унікальне ім'я файлу з часовою міткою
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        filename = f"{name}_{timestamp}.log"
+    def __init__(self, directory: str, name: str, level: int = logging.NOTSET) -> None:
+        log_directory = Path(directory)
 
-        # Викликаємо конструктор батьківського класу (logging.FileHandler)
-        # передаючи йому нове ім'я файлу
-        super().__init__(filename, encoding="utf-8")
+        final_path = log_directory / name
 
-        # Встановлюємо рівень логування
+        final_path.parent.mkdir(parents=True, exist_ok=True)
+
+        super().__init__(final_path, encoding="utf-8")
+
         self.setLevel(level)
 
-        # Встановлюємо форматтер
+
+class LogFileHandler(logging.FileHandler):
+    """
+    A custom handler for logs that writes them to a file
+    with a dynamic name that includes a timestamp.
+    """
+
+    def __init__(self, full_path: str, level: int = logging.NOTSET) -> None:
+        file_path = Path(full_path)
+
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        filename_with_timestamp = f"{file_path.stem}_{timestamp}{file_path.suffix}"
+
+        final_path = file_path.parent / filename_with_timestamp
+
+        final_path.parent.mkdir(parents=True, exist_ok=True)
+
+        super().__init__(final_path, encoding="utf-8")
+
+        self.setLevel(level)
+
         formatter = logging.Formatter(
             "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         )

@@ -45,8 +45,7 @@ class Basic:
         self.number: int | None = (
             None  # Optional numerical suffix, e.g., for unique naming in context.
         )
-        logger_manager = LoggerManager()
-        self.logger: Logger = logger_manager.getLogger(self.__class__.__qualname__)
+        self.logger: Logger = LoggerManager().getLogger(self.__class__.__qualname__)
 
     def copy(self) -> "Basic":
         """
@@ -142,8 +141,7 @@ class BasicArray:
         """
         self.elements = []
         self.element_type: Type[Basic] = element_type
-        logger_manager = LoggerManager()
-        self.logger: Logger = logger_manager.getLogger(self.__class__.__qualname__)
+        self.logger: Logger = LoggerManager().getLogger(self.__class__.__qualname__)
 
     def __len__(self) -> int:
         """

@@ -21,8 +21,7 @@ class Program(metaclass=SingletonMeta):
         self.design_units: DesignUnitArray = DesignUnitArray()
         self.DesignUnit: DesignUnitCallArray = DesignUnitCallArray()
         self._typedefs: TypedefArray = TypedefArray()
-        logger_manager = LoggerManager()
-        self.logger: Logger = logger_manager.getLogger(self.__class__.__qualname__)
+        self.logger: Logger = LoggerManager().getLogger(self.__class__.__qualname__)
 
     @property
     def design_units_calls(self) -> DesignUnitCallArray:

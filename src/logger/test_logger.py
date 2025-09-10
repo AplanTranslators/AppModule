@@ -14,9 +14,8 @@ from logger import Logger, LoggerManager
 # --------------------------
 @pytest.fixture
 def logger_instance() -> Logger:
-    logger_manager = LoggerManager()
-    logger: Logger = logger_manager.getLogger("LoggerTest")
-    #logger.activate()  # ensure active before each test
+    logger: Logger = LoggerManager().getLogger("LoggerTest")
+    # logger.activate()  # ensure active before each test
     return logger
 
 

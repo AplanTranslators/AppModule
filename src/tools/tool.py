@@ -66,8 +66,7 @@ class BaseTool:
 
     def __init__(self, name: str = "Tool"):
         self.name = name
-        logger_manager = LoggerManager()
-        self.logger: Logger = logger_manager.getLogger(self.__class__.__qualname__)
+        self.logger: Logger = LoggerManager().getLogger(self.__class__.__qualname__)
         self.translation_mngr = BaseTranslationManager()
 
     def setType(self, i_type: str):
