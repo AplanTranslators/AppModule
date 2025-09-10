@@ -4,15 +4,13 @@ import time
 import traceback
 from ..translator.base_translator_mngr import BaseTranslationManager
 from ..utils.file_manager import FilesMngr
-from ..utils.logger import Logger
+from ..logger.logger import Logger, LoggerManager
 from ..program.program import Program
 from ..utils.time import TimeUtils
 
 
 class BaseTool:
     # --- Конфігурація логування та повідомлень ---
-    logger = Logger()
-    translation_mngr = BaseTranslationManager()
     time_utils = TimeUtils()
     file_manager = FilesMngr()
     name = ""
@@ -68,6 +66,9 @@ class BaseTool:
 
     def __init__(self, name: str = "Tool"):
         self.name = name
+        logger_manager = LoggerManager()
+        self.logger: Logger = logger_manager.getLogger(self.__class__.__qualname__)
+        self.translation_mngr = BaseTranslationManager()
 
     def setType(self, i_type: str):
         """Встановлює тип для транслятора."""

@@ -6,16 +6,17 @@ from io import StringIO
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from ..utils.logger import Logger
+from logger import Logger, LoggerManager
 
 
 # --------------------------
 # Logger tests
 # --------------------------
 @pytest.fixture
-def logger_instance():
-    logger = Logger()
-    logger.activate()  # ensure active before each test
+def logger_instance() -> Logger:
+    logger_manager = LoggerManager()
+    logger: Logger = logger_manager.getLogger("LoggerTest")
+    #logger.activate()  # ensure active before each test
     return logger
 
 

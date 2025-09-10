@@ -1,8 +1,11 @@
-from ..utils.logger import Logger
+from ..logger.logger import Logger, LoggerManager
 
 
 class BaseTranslationManager:
-    logger = Logger()
+
+    def __init__(self):
+        logger_manager = LoggerManager()
+        self.logger: Logger = logger_manager.getLogger(self.__class__.__qualname__)
 
     def setup(self, *args, **kwargs):
         self.logger.warning("Base translation mngr set up function is called!")

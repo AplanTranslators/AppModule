@@ -2,18 +2,18 @@ from ast import literal_eval
 import os
 import re
 from typing import TYPE_CHECKING
-from ..utils.logger import Logger
-from ..utils.singleton import SingletonMeta
+from ..logger.logger import Logger, LoggerManager
+from ..singleton.singleton import SingletonMeta
 
 if TYPE_CHECKING:
     from ..classes.value_parametrs import ValueParametrArray
 
 
 class StringFormater(metaclass=SingletonMeta):
-    logger = Logger()
 
     def __init__(self):
-        pass
+        logger_manager = LoggerManager()
+        self.logger: Logger = logger_manager.getLogger(self.__class__.__qualname__)
 
     # NEED UNIT TESTS
     def tokenizeExpression(self, expression):

@@ -5,7 +5,7 @@ import os
 import pytest
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from ..utils.singleton import SingletonMeta
+from ..singleton.singleton import SingletonMeta
 from ..utils.time import TimeUtils
 from ..utils.counters import Counters, CounterTypes
 

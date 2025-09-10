@@ -1,11 +1,11 @@
 from ..utils.counters import Counters
-from ..utils.logger import Logger
+from ..logger.logger import Logger, LoggerManager
 from ..utils.string_formater import StringFormater
 from ..program.beh import create_Beh_File
 from ..program.action import create_Action_File
 from ..program.env import create_ENV_File
 from ..program.evt import create_EVT_File
-from ..utils.singleton import SingletonMeta
+from ..singleton.singleton import SingletonMeta
 from ..classes.typedef import TypedefArray
 from ..classes.design_unit import DesignUnitArray
 from ..classes.design_unit_call import DesignUnitCallArray
@@ -13,7 +13,6 @@ import os
 
 
 class Program(metaclass=SingletonMeta):
-    logger = Logger()
     str_formater = StringFormater()
     counters = Counters()
 
@@ -22,6 +21,8 @@ class Program(metaclass=SingletonMeta):
         self.design_units: DesignUnitArray = DesignUnitArray()
         self.DesignUnit: DesignUnitCallArray = DesignUnitCallArray()
         self._typedefs: TypedefArray = TypedefArray()
+        logger_manager = LoggerManager()
+        self.logger: Logger = logger_manager.getLogger(self.__class__.__qualname__)
 
     @property
     def design_units_calls(self) -> DesignUnitCallArray:

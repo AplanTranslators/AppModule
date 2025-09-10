@@ -1,4 +1,4 @@
-from ..utils.singleton import SingletonMeta
+from ..singleton.singleton import SingletonMeta
 from enum import Enum, auto
 
 
