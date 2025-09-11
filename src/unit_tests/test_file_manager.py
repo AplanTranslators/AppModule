@@ -32,32 +32,32 @@ class TestIsPassExist:
 
 
 # ---------------------------
-# Tests for is_testing_file
+# Tests for isTestingFile
 # ---------------------------
 class TestIsTestingFile:
     def test_correct_extension(self, file_manager, tmp_path):
         """
-        Test that is_testing_file returns True for a valid file with the correct extension.
+        Test that isTestingFile returns True for a valid file with the correct extension.
         """
         test_file = tmp_path / "test.py"
         test_file.touch()
-        assert file_manager.is_testing_file(str(test_file), "py") is True
+        assert file_manager.isTestingFile(str(test_file), "py") is True
 
     def test_incorrect_extension(self, file_manager, tmp_path):
         """
-        Test that is_testing_file raises ValueError for a file with an incorrect extension.
+        Test that isTestingFile raises ValueError for a file with an incorrect extension.
         """
         test_file = tmp_path / "test.txt"
         test_file.touch()
         with pytest.raises(ValueError, match="is not a .py file"):
-            file_manager.is_testing_file(str(test_file), "py")
+            file_manager.isTestingFile(str(test_file), "py")
 
     def test_path_is_directory(self, file_manager, tmp_path):
         """
         Should raise ValueError when the path is a directory instead of a file
         """
         with pytest.raises(ValueError, match="is not a .py file"):
-            file_manager.is_testing_file(str(tmp_path), "py")
+            file_manager.isTestingFile(str(tmp_path), "py")
 
 
 # ---------------------------

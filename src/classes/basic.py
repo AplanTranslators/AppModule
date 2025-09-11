@@ -2,7 +2,7 @@ import copy
 from typing import Any, List, Tuple, Type
 from ..classes.element_types import ElementsTypes
 from ..utils.counters import Counters
-from ..logger.logger import Logger, LoggerManager
+from ..logger.logger import Logger
 from ..utils.string_formater import StringFormater
 from ..utils.unsorted import UnsortedUnils
 
@@ -45,7 +45,7 @@ class Basic:
         self.number: int | None = (
             None  # Optional numerical suffix, e.g., for unique naming in context.
         )
-        self.logger: Logger = LoggerManager().getLogger(self.__class__.__qualname__)
+        self.logger: Logger = Logger(self.__class__.__qualname__)
 
     def copy(self) -> "Basic":
         """
@@ -141,7 +141,7 @@ class BasicArray:
         """
         self.elements = []
         self.element_type: Type[Basic] = element_type
-        self.logger: Logger = LoggerManager().getLogger(self.__class__.__qualname__)
+        self.logger: Logger = Logger(self.__class__.__qualname__)
 
     def __len__(self) -> int:
         """

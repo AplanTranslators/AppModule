@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING
 
+from Core.src.logger.logger import LOG_NL
+
 from ..classes.declarations import DeclTypes
 
 from ..classes.element_types import ElementsTypes
@@ -8,13 +10,13 @@ if TYPE_CHECKING:
     from program import Program
 
 
-def create_ENV_File(self: "Program"):
-    env = "environment (\n"  # Open env
+def generateEnv(self: "Program"):
+    self.aplan_logger.env("environment (")
 
     # ----------------------------------
     # Types
     # ----------------------------------
-    env += "\ttypes : obj (\n"
+    self.aplan_logger.env("\ttypes : obj (")
     sub_env = ""
     decls = self.typedefs.getElementsIE()
 
@@ -22,69 +24,81 @@ def create_ENV_File(self: "Program"):
         decls += design_unit.typedefs.getElementsIE()
 
     sub_env += str(decls)
+
     if len(sub_env) > 0:
-        env += sub_env + "\n"
+        self.aplan_logger.env(sub_env)
     else:
-        env += "\t\t\tNil\n"
-    env += "\t);\n"
+        self.aplan_logger.env("\t\t\tNil")
+
+    self.aplan_logger.env("\t);")
 
     # ----------------------------------
     # Attributes
     # ----------------------------------
-
-    env += "\tattributes : obj (Nil);\n"
+    self.aplan_logger.env("\tattributes : obj (Nil);")
 
     # ----------------------------------
     # Agents types
     # ----------------------------------
 
-    env += "\tagent_types : obj (\n"
+    self.aplan_logger.env("\tagent_types : obj (")
 
+    # Генеруємо рядки для кожного design_unit
+    design_unit_strings = []
     for design_unit in self.design_units.getElementsIE(
         exclude=ElementsTypes.OBJECT_ELEMENT
     ).getElements():
-        env += "\t\t{0} : obj (\n".format(design_unit.ident_uniq_name_upper)
-        sub_env = ""
         decls = design_unit.declarations.getElementsIE(
             data_type_exclude=DeclTypes.ENUM_TYPE
         )
-        for index, elem in enumerate(decls.getElements()):
-            if index > 0:
-                sub_env += ",\n"
-            sub_env += "\t\t\t{0}:{1}".format(elem.getName(), elem.getAplanDecltype())
-            if index + 1 == len(decls):
-                sub_env += "\n"
-        if len(sub_env) > 0:
-            env += sub_env
-        else:
-            env += "\t\t\tNil\n"
-        env += "\t\t),\n"
-    env += "\t\tENVIRONMENT:obj(Nil)\n"
-    env += "\t);\n"
+
+        element_strings = [
+            "\t\t\t{0}:{1}".format(elem.getName(), elem.getAplanDecltype())
+            for elem in decls.getElements()
+        ]
+
+        # Використовуємо тернарний оператор для вибору між елементами та "Nil"
+        decls_content = ",\n".join(element_strings) if element_strings else "\t\t\tNil"
+
+        design_unit_content = ("\t\t{0} : obj (\n" "{1}\n" "\t\t),").format(
+            design_unit.ident_uniq_name_upper, decls_content
+        )
+
+        design_unit_strings.append(design_unit_content)
+
+    # Логуємо об'єднані рядки
+    self.aplan_logger.env("\n".join(design_unit_strings))
+
+    self.aplan_logger.env("\t\tENVIRONMENT:obj(Nil)")
+    self.aplan_logger.env("\t);")
 
     # ----------------------------------
     # Agents
     # ----------------------------------
-    env += "\tagents : obj (\n"
+    self.aplan_logger.env("\tagents : obj (")
     for design_unit in self.design_units.getElementsIE(
         exclude=ElementsTypes.CLASS_ELEMENT
     ).getElements():
-        env += "\t\t{0} : obj ({1}),\n".format(
-            design_unit.ident_uniq_name_upper, design_unit.ident_uniq_name
+        self.aplan_logger.env(
+            "\t\t{0} : obj ({1}),".format(
+                design_unit.ident_uniq_name_upper,
+                design_unit.ident_uniq_name,
+            )
         )
-    env += "\t\tENVIRONMENT : obj (env)\n"
-    env += "\t);\n"
+
+    self.aplan_logger.env("\t\tENVIRONMENT : obj (env)")
+    self.aplan_logger.env("\t);")
 
     # ----------------------------------
     # Axioms
     # ----------------------------------
-    env += "\taxioms : obj (Nil);\n"
+    self.aplan_logger.env("\taxioms : obj (Nil);")
 
     # ----------------------------------
     # Logic formula
     # ----------------------------------
-    env += "\tlogic_formula : obj (1)\n"
-    env += ");"  # Close env
+    self.aplan_logger.env("\tlogic_formula : obj (1)")
+    self.aplan_logger.env(");")
 
-    self.write_to_file(self.path_to_result + "project.env_descript", env)
-    self.logger.info(".env_descript file created \n", "purple")
+    # self.write_to_file(self.result_path + "project.env_descript", env)
+    self.logger.info(".env_descript file created ", "purple")

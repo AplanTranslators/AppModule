@@ -1,7 +1,7 @@
 import logging
 import pytest
 from io import StringIO
-from ..logger.logger import Logger, LoggerManager
+from ..logger.logger import Logger
 
 
 # --------------------------
@@ -9,7 +9,7 @@ from ..logger.logger import Logger, LoggerManager
 # --------------------------
 @pytest.fixture
 def logger_instance() -> Logger:
-    logger: Logger = LoggerManager().getLogger("LoggerTest")
+    logger: Logger = Logger("LoggerTest")
     # logger.activate()  # ensure active before each test
     return logger
 

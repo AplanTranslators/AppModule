@@ -2,7 +2,7 @@ from ast import literal_eval
 import os
 import re
 from typing import TYPE_CHECKING
-from ..logger.logger import Logger, LoggerManager
+from ..logger.logger import Logger
 from ..singleton.singleton import SingletonMeta
 
 if TYPE_CHECKING:
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 class StringFormater(metaclass=SingletonMeta):
 
     def __init__(self):
-        self.logger: Logger = LoggerManager().getLogger(self.__class__.__qualname__)
+        self.logger: Logger = Logger(self.__class__.__qualname__)
 
     # NEED UNIT TESTS
     def tokenizeExpression(self, expression):

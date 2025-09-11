@@ -1,10 +1,11 @@
 import difflib
 import json
+from pathlib import Path
 import shutil
 import os
 from typing import Dict, List
 
-from ..logger.logger import Logger, LoggerManager
+from ..logger.logger import Logger
 from ..singleton.singleton import SingletonMeta
 
 import glob
@@ -14,16 +15,16 @@ ExampleEntry = Dict[str, str]
 
 class FilesMngr(metaclass=SingletonMeta):
     def __init__(self):
-        self.logger: Logger = LoggerManager().getLogger(self.__class__.__qualname__)
+        self.logger: Logger = Logger(self.__class__.__qualname__)
 
-    def is_pass_exist(self, path: str):
-        if not os.path.exists(path):
+    def is_pass_exist(self, path: Path):
+        if not path.exists():
             raise ValueError(f"Path '{path}' does not exist")
 
-    def is_testing_file(self, path: str, language_type: str):
-        self.is_pass_exist(path)
+    def isTestingFile(self, path: Path, language_type: str):
+        self.is_pass_exist(path)  # Припустимо, цей метод також оновлено для Path
 
-        if os.path.isfile(path) and path.endswith(f".{language_type}"):
+        if path.is_file() and path.suffix == f".{language_type}":
             return True
         else:
             raise ValueError(f"Path '{path}' is not a .{language_type} file")

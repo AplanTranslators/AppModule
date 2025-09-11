@@ -10,16 +10,13 @@ def create_Action_File(self: "Program"):
     # Actions
     # ----------------------------------
     actions = ""
-    for index, design_unit in enumerate(
-        self.design_units.getElementsIE(
-            exclude=ElementsTypes.OBJECT_ELEMENT
-        ).getElements()
-    ):
-        result = design_unit.actions.getActionsInStrFormat()
-        if index != 0:
-            if len(result) > 0:
-                actions += ",\n"
-        actions += result
+    design_units = self.design_units.getElementsIE(
+        exclude=ElementsTypes.OBJECT_ELEMENT
+    ).getElements()
+    element_strings = [unit.actions.getActionsInStrFormat() for unit in design_units]
+    actions = ",\n".join(element_strings)
 
-    self.write_to_file(self.path_to_result + "project.act", actions)
+    self.aplan_logger.act(actions)
+
+    #    self.write_to_file(self.path_to_result + "project.act", actions)
     self.logger.info(".act file created \n", "purple")

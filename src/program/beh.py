@@ -10,25 +10,25 @@ def create_Beh_File(self: "Program"):
     # Behaviour
     # ----------------------------------
     behaviour = []
-    for index, design_unit in enumerate(
-        self.design_units.getElementsIE(
-            exclude=ElementsTypes.OBJECT_ELEMENT
-        ).getElements()
-    ):
+    for design_unit in self.design_units.getElementsIE(
+        exclude=ElementsTypes.OBJECT_ELEMENT
+    ).getElements():
 
-        raw_protocol_strings = [
-            design_unit.getBehInitProtocols(),
-            design_unit.structures.getStructuresInStrFormat(),
-            design_unit.out_of_block_elements.getProtocolsInStrFormat(),
+        # Створення та фільтрація рядків в одному рядку коду
+        protocol_strings = [
+            s
+            for s in [
+                design_unit.getBehInitProtocols(),
+                design_unit.structures.getStructuresInStrFormat(),
+                design_unit.out_of_block_elements.getProtocolsInStrFormat(),
+            ]
+            if s and s.strip()
         ]
-        tmp = [s for s in raw_protocol_strings if s and s.strip()]
-        tmp = "\n".join(tmp)
 
+        tmp = "\n".join(protocol_strings)
         tmp = self.str_formater.removeTrailingComma(tmp)
-
         behaviour.append(tmp)
 
     behaviour = ",\n".join(behaviour)
-
-    self.write_to_file(self.path_to_result + "project.behp", behaviour)
+    self.aplan_logger.behpPush(behaviour)
     self.logger.info(".beh file created", "purple")

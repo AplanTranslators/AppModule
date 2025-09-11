@@ -94,22 +94,50 @@ LOG_COLORS = Literal[
     "bg_white",
 ]
 
+APLANE_LOG_TYPE = Literal["env", "evt", "act", "behp"]
+LOG_NL = "\n"
+
+
+class AplanLogTypeFilter(logging.Filter):
+    """
+    Filter to check for the presence of the 'log_type' attribute in the record.
+    """
+
+    def __init__(self, log_type: APLANE_LOG_TYPE):
+        super().__init__()
+        self.log_type = log_type
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        """
+        Returns True if the 'log_type' attribute in the record matches the expected one.
+        """
+        # Check if the attribute exists and if it matches the expected type
+        return getattr(record, "log_type", None) == self.log_type
+
 
 class LogAplanFileHandler(logging.FileHandler):
     """
     A custom handler for logs that writes them to a .act file
     """
 
-    def __init__(self, directory: str, name: str, level: int = logging.NOTSET) -> None:
-        log_directory = Path(directory)
+    def __init__(self, directory: Path, name: str, level: int = logging.NOTSET) -> None:
 
-        final_path = log_directory / name
+        final_path = directory / name
 
         final_path.parent.mkdir(parents=True, exist_ok=True)
 
-        super().__init__(final_path, encoding="utf-8")
+        super().__init__(final_path, mode="w", encoding="utf-8")
 
         self.setLevel(level)
+
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            stream = self.stream
+            stream.write(msg)
+            self.flush()
+        except Exception:
+            self.handleError(record)
 
 
 class LogFileHandler(logging.FileHandler):
@@ -161,8 +189,8 @@ class Logger:
 
     def __init__(self, name):
         self.active = True
-        self.logger = logging.getLogger(name)
-        self.logger.setLevel(logging.INFO)
+        self.instance = logging.getLogger(name)
+        self.instance.setLevel(logging.INFO)
 
         console_handler = logging.StreamHandler()
 
@@ -230,7 +258,7 @@ class Logger:
         )
 
         console_handler.setFormatter(self.formatter)
-        self.logger.addHandler(console_handler)
+        self.instance.addHandler(console_handler)
 
     def activate(self):
         self.active = True
@@ -242,7 +270,7 @@ class Logger:
         extra_kwargs = {}
         if color:
             extra_kwargs["extra"] = {"temp_log_color": color}
-        self.logger.log(level, msg, **extra_kwargs)
+        self.instance.log(level, msg, **extra_kwargs)
 
     def nonset(self, msg: str, color: Optional[LOG_COLORS] = None):
         if self.active:
@@ -283,53 +311,60 @@ class Logger:
             self.info(base_delimiter_string, color)
 
 
-class LoggerManager(metaclass=SingletonMeta):
-    """
-    Керує створенням та налаштуванням усіх логерів в додатку.
-    """
+class AplanLogger(metaclass=SingletonMeta):
+    def __init__(self, result_path: Path = None) -> None:
+        if result_path:
+            self.result_path: Path = result_path
+        else:
+            self.result_path = Path("results")
 
-    def __init__(self):
-        self._loggers: Dict[str, Logger] = {}
-        self._is_setup = False
+        self.instance = logging.getLogger(self.__class__.__qualname__)
+        self.instance.propagate = False
+        self.instance.setLevel(logging.INFO)
 
-    def getLogger(self, name: str) -> Logger:
-        """
-        Повертає логер для вказаного імені.
-        Якщо логер не існує, він створюється і додається до масиву.
-        """
+        # Перевірка, щоб уникнути повторного додавання хендлерів
+        if not self.instance.handlers:
+            env_handler = LogAplanFileHandler(self.result_path, "project.env_descript")
+            evt_handler = LogAplanFileHandler(self.result_path, "project.evt_descript")
+            act_handler = LogAplanFileHandler(self.result_path, "project.act")
+            behp_handler = LogAplanFileHandler(self.result_path, "project.behp")
 
-        if name not in self._loggers:
-            self._loggers[name] = Logger(name)
-            self._loggers[name].activate()
+            env_handler.addFilter(AplanLogTypeFilter("env"))
+            evt_handler.addFilter(AplanLogTypeFilter("evt"))
+            act_handler.addFilter(AplanLogTypeFilter("act"))
+            behp_handler.addFilter(AplanLogTypeFilter("behp"))
 
-        return self._loggers[name]
+            self.instance.addHandler(env_handler)
+            self.instance.addHandler(evt_handler)
+            self.instance.addHandler(act_handler)
+            self.instance.addHandler(behp_handler)
 
-    # CRITICAL = 50
-    # FATAL = CRITICAL
-    # ERROR = 40
-    # WARNING = 30
-    # WARN = WARNING
-    # INFO = 20
-    # DEBUG = 10
-    # NOTSET = 0
-    def setLevelForAll(self, level: int):
-        """
-        Встановлює рівень логування для всіх логерів.
-        """
-        for logger_obj in self._loggers.values():
-            logger_obj.logger.setLevel(level)
+    def _log(self, log_type, msg, push_mode=False):
+        """Допоміжний метод для уникнення дублювання коду."""
+        if not push_mode:
+            msg += "\n"
+        self.instance.info(msg, extra={"log_type": log_type})
 
-    def setLevelFor(self, name: str, level: int):
-        """
-        Встановлює рівень логування для конкретного логера.
-        """
-        if name in self._loggers:
-            self._loggers[name].logger.setLevel(level)
+    def evt(self, msg):
+        self._log("evt", msg)
 
-    def activate(self, name: str):
-        if name in self._loggers:
-            self._loggers[name].activate()
+    def env(self, msg):
+        self._log("env", msg)
 
-    def deactivate(self, name: str):
-        if name in self._loggers:
-            self._loggers[name].deactivate()
+    def act(self, msg):
+        self._log("act", msg)
+
+    def behp(self, msg):
+        self._log("behp", msg)
+
+    def evtPush(self, msg):
+        self._log("evt", msg, push_mode=True)
+
+    def envPush(self, msg):
+        self._log("env", msg, push_mode=True)
+
+    def actPush(self, msg):
+        self._log("act", msg, push_mode=True)
+
+    def behpPush(self, msg):
+        self._log("behp", msg, push_mode=True)

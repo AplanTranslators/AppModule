@@ -1,10 +1,11 @@
 import os
+from pathlib import Path
 import sys
 import time
 import traceback
 from ..translator.base_translator_mngr import BaseTranslationManager
 from ..utils.file_manager import FilesMngr
-from ..logger.logger import Logger, LoggerManager
+from ..logger.logger import Logger
 from ..program.program import Program
 from ..utils.time import TimeUtils
 
@@ -66,7 +67,7 @@ class BaseTool:
 
     def __init__(self, name: str = "Tool"):
         self.name = name
-        self.logger: Logger = LoggerManager().getLogger(self.__class__.__qualname__)
+        self.logger: Logger = Logger(self.__class__.__qualname__)
         self.translation_mngr = BaseTranslationManager()
 
     def setType(self, i_type: str):
@@ -100,11 +101,12 @@ class BaseTool:
         self.logger.error(message)
         traceback.print_exception(type(e), e, e.__traceback__, file=sys.stderr)
 
-    def start(self, path: str, path_to_aplan_result: str) -> bool:
+    def start(self, path: str | None, result_path: str | None) -> bool:
         """
         Запускає основний процес перекладу файлу.
         Повертає True, якщо сталася помилка, інакше False.
         """
+
         if not self._type:
             self.logger.error("Select type for translator")
             return True  # Повертаємо True, оскільки це помилка
@@ -126,15 +128,13 @@ class BaseTool:
         )
 
         try:
-            program = Program(path_to_aplan_result)
-            program.path_to_result = path_to_aplan_result
+            program = Program(result_path)
 
-            if self.file_manager.is_testing_file(path, self._type.lower()):
+            if self.file_manager.isTestingFile(path, self._type.lower()):
                 self.translation_mngr.setup(path)
                 self.translation_mngr.translate()
 
-            program.create_result_dirrectory()
-            program.create_aplan_files()
+            program.generateAplan()
             return False  # Успішне виконання
         except Exception as e:
             self._handle_exception(e, self.MSG_PROGRAM_ERROR)
@@ -166,8 +166,8 @@ class BaseTool:
         self,
         operation_type: str,
         item_number: int,
-        source_file: str,
-        result_path: str,
+        source_file: Path,
+        result_path: Path,
         aplan_code_path: str = None,
     ) -> bool:
         """
@@ -227,7 +227,11 @@ class BaseTool:
         return has_error
 
     def run_test(
-        self, test_number: int, source_file: str, result_path: str, aplan_code_path: str
+        self,
+        test_number: int,
+        source_file: Path,
+        result_path: Path,
+        aplan_code_path: str,
     ) -> bool:
         """Запускає один тест."""
         return self._execute_single_operation(
@@ -235,7 +239,7 @@ class BaseTool:
         )
 
     def run_generation(
-        self, gen_number: int, source_file: str, result_path: str
+        self, gen_number: int, source_file: Path, result_path: Path
     ) -> bool:
         """Запускає одну генерацію."""
         return self._execute_single_operation(
@@ -243,7 +247,7 @@ class BaseTool:
         )
 
     def _execute_examples_loop(
-        self, examples_list_path: str, process_func, process_name: str
+        self, examples_list_path: Path, process_func, process_name: str
     ) -> int:
         """
         Уніфікована логіка для запуску тестів або генерації з файлу прикладів.
@@ -306,25 +310,25 @@ class BaseTool:
         )
 
     def regeneration_start(
-        self, examples_list_path: str = None, path_to_vhdl: str = None
+        self, examples_list_path: Path = None, path_to_file: Path = None
     ) -> int:
         """
         Запускає процес генерації коду: або для всіх прикладів з файлу, або для одного SV-файлу.
         Повертає 0, якщо все успішно, 1, якщо є помилки.
         """
-        if not examples_list_path and not path_to_vhdl:
+        if not examples_list_path and not path_to_file:
             self.logger.error("Please input path for regeneration.")
             sys.exit(1)
 
-        if path_to_vhdl is None:
+        if path_to_file is None:
             return self._execute_examples_loop(
                 examples_list_path, self._run_single_generation_wrapper, "GENERATION"
             )
         else:
 
             # Обробка одного файлу окремо, оскільки він не зчитується з JSON-списку
-            directory = os.path.dirname(path_to_vhdl)
-            source_file = path_to_vhdl
+            directory = os.path.dirname(path_to_file)
+            source_file = path_to_file
             result_path = os.path.join(
                 directory, "aplan"
             )  # Або інший шлях за замовчуванням для одного файлу
